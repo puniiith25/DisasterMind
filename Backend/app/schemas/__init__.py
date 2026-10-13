@@ -15,6 +15,14 @@ from app.schemas.vlm import (
     VLMBenchmarkReport,
 )
 
+from app.schemas.evidence import (
+    EvidenceSourceType,
+    ImageRole,
+    EvidenceImageReference,
+    EvidenceRecord,
+    CorpusStatistics,
+)
+
 __all__ = [
     "DisasterM3Record",
     "ValidationIssue",
@@ -25,4 +33,9 @@ __all__ = [
     "VLMInferenceResponse",
     "VLMBenchmarkSampleResult",
     "VLMBenchmarkReport",
+    "EvidenceSourceType",
+    "ImageRole",
+    "EvidenceImageReference",
+    "EvidenceRecord",
+    "CorpusStatistics",
 ]

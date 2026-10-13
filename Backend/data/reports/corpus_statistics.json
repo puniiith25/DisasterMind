@@ -1,0 +1,33 @@
+{
+  "total_records": 1263,
+  "source_type_distribution": {
+    "dataset_qa": 1079,
+    "verified_description": 184
+  },
+  "task_distribution": {
+    "Disaster Bearing Bodies Recognition": 328,
+    "Building Damage Counting": 228,
+    "Road Damage Counting": 294,
+    "Disaster Scene Recognition": 177,
+    "Disaster Type Recognition": 37,
+    "Relational Reasoning": 199
+  },
+  "disaster_type_distribution": {
+    "Tornado": 113,
+    "Explosion": 51,
+    "Earthquake": 326,
+    "Flood": 150,
+    "Hurricane": 181,
+    "Volcano": 43,
+    "Wildfire": 125,
+    "Tsunami": 83,
+    "Conflict": 6,
+    "Unspecified": 185
+  },
+  "modality_distribution": {
+    "Optical": 1660,
+    "SAR": 299
+  },
+  "total_images_referenced": 1959,
+  "generated_at": "2026-10-13T14:45:10.259212+00:00"
+}
