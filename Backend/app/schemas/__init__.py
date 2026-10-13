@@ -8,10 +8,21 @@ from app.schemas.dataset import (
     TaskType,
 )
 
+from app.schemas.vlm import (
+    VLMInferenceRequest,
+    VLMInferenceResponse,
+    VLMBenchmarkSampleResult,
+    VLMBenchmarkReport,
+)
+
 __all__ = [
     "DisasterM3Record",
     "ValidationIssue",
     "ValidationReport",
     "DatasetSplitSummary",
     "TaskType",
+    "VLMInferenceRequest",
+    "VLMInferenceResponse",
+    "VLMBenchmarkSampleResult",
+    "VLMBenchmarkReport",
 ]
