@@ -30,6 +30,14 @@ from app.schemas.embedding import (
     EmbeddingBenchmarkReport,
 )
 
+from app.schemas.retrieval import (
+    CollectionStatus,
+    IndexedPoint,
+    IndexBuildReport,
+    RetrievalResult,
+    RetrievalResponse,
+)
+
 __all__ = [
     "DisasterM3Record",
     "ValidationIssue",
@@ -49,4 +57,9 @@ __all__ = [
     "EmbeddingMetadata",
     "EmbeddingBatchResult",
     "EmbeddingBenchmarkReport",
+    "CollectionStatus",
+    "IndexedPoint",
+    "IndexBuildReport",
+    "RetrievalResult",
+    "RetrievalResponse",
 ]

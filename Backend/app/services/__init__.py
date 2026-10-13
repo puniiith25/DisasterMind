@@ -3,6 +3,7 @@
 from app.services.corpus_service import EvidenceCorpusGenerator
 from app.services.dataset_validator import DatasetValidator
 from app.services.embedding_service import BGEM3EmbeddingService, get_embedding_service
+from app.services.qdrant_service import QdrantIndexService, get_qdrant_service
 from app.services.vlm_service import QwenVLMService, get_vlm_service
 
 __all__ = [
@@ -12,4 +13,6 @@ __all__ = [
     "EvidenceCorpusGenerator",
     "BGEM3EmbeddingService",
     "get_embedding_service",
+    "QdrantIndexService",
+    "get_qdrant_service",
 ]
