@@ -23,6 +23,13 @@ from app.schemas.evidence import (
     CorpusStatistics,
 )
 
+from app.schemas.embedding import (
+    EmbeddingRepresentation,
+    EmbeddingMetadata,
+    EmbeddingBatchResult,
+    EmbeddingBenchmarkReport,
+)
+
 __all__ = [
     "DisasterM3Record",
     "ValidationIssue",
@@ -38,4 +45,8 @@ __all__ = [
     "EvidenceImageReference",
     "EvidenceRecord",
     "CorpusStatistics",
+    "EmbeddingRepresentation",
+    "EmbeddingMetadata",
+    "EmbeddingBatchResult",
+    "EmbeddingBenchmarkReport",
 ]

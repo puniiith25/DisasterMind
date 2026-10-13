@@ -52,4 +52,7 @@ Backend/data/disasterm3/raw/.cache/
 
 # Local Vector Store & Databases
 Backend/data/qdrant/
+Backend/data/cache/
 *.sqlite3
+*.npz
+
