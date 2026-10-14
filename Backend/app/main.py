@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -93,6 +93,13 @@ def get_verification() -> Any:
     """Dependency that yields the singleton EvidenceVerificationService."""
     from app.services.verification_service import get_verification_service
     return get_verification_service()
+
+
+def get_intelligence() -> Any:
+    """Dependency that yields the singleton IncidentIntelligenceService."""
+    from app.services.intelligence_service import get_intelligence_service
+    return get_intelligence_service()
+
 
 
 
@@ -385,4 +392,76 @@ def verify_prediction(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Evidence verification failed: {str(exc)}",
+        ) from exc
+
+
+# ---------------------------------------------------------------------------
+# Routes: Real-time Image & Live Internet Intelligence
+# ---------------------------------------------------------------------------
+
+
+class IntelligenceJSONRequest(BaseModel):
+    question: str
+    image_path: Optional[str] = None
+    search_live: bool = True
+
+
+@app.post(
+    "/api/v1/intelligence/analyze",
+    summary="Analyze Incident with Live Internet Evidence (JSON)",
+    tags=["Intelligence"],
+)
+def analyze_intelligence_json(
+    request: IntelligenceJSONRequest,
+    intelligence_svc: Any = Depends(get_intelligence),
+) -> Any:
+    """Analyze query and optional local image path against live internet disaster bulletins."""
+    try:
+        return intelligence_svc.analyze_incident(
+            question=request.question,
+            image_path=request.image_path,
+            search_live=request.search_live,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Intelligence analysis failed: {str(exc)}",
+        ) from exc
+
+
+@app.post(
+    "/api/v1/intelligence/analyze-upload",
+    summary="Upload Image & Analyze Incident with Live Internet Search",
+    tags=["Intelligence"],
+)
+async def analyze_intelligence_upload(
+    question: str = Form(...),
+    search_live: bool = Form(True),
+    image: Optional[UploadFile] = File(None),
+    intelligence_svc: Any = Depends(get_intelligence),
+) -> Any:
+    """
+    Accepts user uploaded image + natural language question.
+    Determines WHAT is happening, WHERE, HOW, and retrieves real-time live internet evidence.
+    """
+    saved_path = None
+    try:
+        import time
+        if image and image.filename:
+            upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
+            upload_dir.mkdir(parents=True, exist_ok=True)
+            saved_path = upload_dir / f"upload_{int(time.time())}_{image.filename}"
+            with open(saved_path, "wb") as f:
+                content = await image.read()
+                f.write(content)
+
+        return intelligence_svc.analyze_incident(
+            question=question,
+            image_path=str(saved_path) if saved_path else None,
+            search_live=search_live,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Uploaded image intelligence analysis failed: {str(exc)}",
         ) from exc

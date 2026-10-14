@@ -374,3 +374,38 @@ def test_verification_verify_endpoint(client):
     finally:
         app.dependency_overrides.clear()
 
+
+def test_intelligence_analyze_json_endpoint(client):
+    """POST /api/v1/intelligence/analyze returns What, Where, How, and live evidence."""
+    from app.main import get_intelligence
+    from app.schemas.intelligence import IncidentBreakdown, IntelligenceResponse
+
+    mock_intel = MagicMock()
+    mock_intel.analyze_incident.return_value = IntelligenceResponse(
+        question="What disaster happened in Antakya?",
+        summary="WHAT: Earthquake | WHERE: Antakya | HOW: Fault rupture",
+        breakdown=IncidentBreakdown(
+            what_happened="Catastrophic earthquake with 45 collapsed buildings.",
+            where_it_happened="Antakya, Turkey",
+            how_it_happened="Tectonic plate fault rupture.",
+            impact_and_severity="Severe structural damage.",
+            detected_disaster_type="Earthquake",
+            confidence=0.95,
+        ),
+        live_internet_evidence=[],
+        source_provenance=[{"source": "USGS", "details": "Live feed"}],
+        latency_ms=12.0,
+    )
+
+    app.dependency_overrides[get_intelligence] = lambda: mock_intel
+    try:
+        payload = {"question": "What disaster happened in Antakya?"}
+        response = client.post("/api/v1/intelligence/analyze", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["breakdown"]["detected_disaster_type"] == "Earthquake"
+        assert "Antakya" in data["breakdown"]["where_it_happened"]
+    finally:
+        app.dependency_overrides.clear()
+
+
