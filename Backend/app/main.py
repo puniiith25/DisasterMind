@@ -27,9 +27,32 @@ from app.services.multimodal_service import (
     MultimodalRetrievalRequest,
     MultimodalRetrievalResponse,
 )
+import logging
+import threading
+from contextlib import asynccontextmanager
+
 from app.services.qdrant_service import QdrantIndexService
 from app.services.rag_service import RAGPipelineService, get_rag_service
 from app.services.vlm_service import QwenVLMService
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Warm up vision model in background thread so user never hits cold-start 20s delay
+    def _warmup():
+        try:
+            from app.services.vlm_service import get_vlm_service
+            logger.info("Warming up VLM model in background thread...")
+            get_vlm_service().load_model()
+            logger.info("VLM model successfully warmed up and ready!")
+        except Exception as err:
+            logger.warning("VLM background warmup deferred: %s", err)
+
+    threading.Thread(target=_warmup, daemon=True).start()
+    yield
+
 
 app = FastAPI(
     title="DisasterMind API",
@@ -37,6 +60,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Allow CORS for frontends (e.g., local React / Next.js)
@@ -404,6 +428,7 @@ class IntelligenceJSONRequest(BaseModel):
     question: str
     image_path: Optional[str] = None
     search_live: bool = True
+    engine_mode: str = "fast"
 
 
 @app.post(
@@ -421,6 +446,7 @@ def analyze_intelligence_json(
             question=request.question,
             image_path=request.image_path,
             search_live=request.search_live,
+            engine_mode=request.engine_mode,
         )
     except Exception as exc:
         raise HTTPException(
@@ -437,6 +463,7 @@ def analyze_intelligence_json(
 async def analyze_intelligence_upload(
     question: str = Form(...),
     search_live: bool = Form(True),
+    engine_mode: str = Form("fast"),
     image: Optional[UploadFile] = File(None),
     intelligence_svc: Any = Depends(get_intelligence),
 ) -> Any:
@@ -459,6 +486,7 @@ async def analyze_intelligence_upload(
             question=question,
             image_path=str(saved_path) if saved_path else None,
             search_live=search_live,
+            engine_mode=engine_mode,
         )
     except Exception as exc:
         raise HTTPException(

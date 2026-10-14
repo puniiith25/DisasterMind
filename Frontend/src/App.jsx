@@ -13,6 +13,7 @@ export default function App() {
   const [intelLoading, setIntelLoading] = useState(false);
   const [intelResult, setIntelResult] = useState(null);
   const [intelError, setIntelError] = useState(null);
+  const [engineMode, setEngineMode] = useState('fast');
   const fileInputRef = useRef(null);
 
   // RAG query state
@@ -68,6 +69,7 @@ export default function App() {
     const formData = new FormData();
     formData.append('question', intelQuestion);
     formData.append('search_live', searchLiveWeb);
+    formData.append('engine_mode', engineMode);
     if (uploadedFile) {
       formData.append('image', uploadedFile);
     }
@@ -358,6 +360,49 @@ export default function App() {
               </div>
             </div>
 
+            {/* Engine Speed & Precision Selector */}
+            <div>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
+                Assessment Engine Speed:
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.35rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <button
+                  type="button"
+                  onClick={() => setEngineMode('fast')}
+                  style={{
+                    padding: '0.55rem',
+                    borderRadius: '6px',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: engineMode === 'fast' ? '#0284c7' : 'transparent',
+                    color: '#fff',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  ⚡ Instant Fast (&lt; 0.5s)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEngineMode('deep_vlm')}
+                  style={{
+                    padding: '0.55rem',
+                    borderRadius: '6px',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: engineMode === 'deep_vlm' ? '#4f46e5' : 'transparent',
+                    color: '#fff',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  🔬 Deep VLM (~15s)
+                </button>
+              </div>
+            </div>
+
             {/* Submit Button */}
             <button
               className="btn-primary"
@@ -365,7 +410,10 @@ export default function App() {
               onClick={handleAnalyzeIntelligence}
               disabled={intelLoading}
             >
-              {intelLoading ? '⏳ Analyzing Scene & Querying Live Web...' : '🚀 Find Out What, Where, How & Show Evidence'}
+              {intelLoading
+                ? (engineMode === 'fast' ? '⏳ Assessing Visual Damage & Telemetry...' : '⏳ Deep 3B Model Reasoning on Apple Silicon...')
+                : (engineMode === 'fast' ? '⚡ Instant Assessment (Image + Live USGS)' : '🚀 Deep VLM Assessment (Qwen2.5-VL 3B)')
+              }
             </button>
           </div>
 

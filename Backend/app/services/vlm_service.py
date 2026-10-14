@@ -44,8 +44,8 @@ class QwenVLMService:
         model_id: str = "Qwen/Qwen2.5-VL-3B-Instruct",
         device: str = "auto",
         torch_dtype: Optional[torch.dtype] = None,
-        min_pixels: int = 224 * 224,
-        max_pixels: int = 448 * 448,
+        min_pixels: int = 128 * 128,
+        max_pixels: int = 384 * 384,
     ) -> None:
         self.model_id = model_id
         self.device = select_device(device)
