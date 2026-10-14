@@ -7,6 +7,7 @@ from app.services.embedding_service import BGEM3EmbeddingService, get_embedding_
 from app.services.multimodal_service import MultimodalRetrievalService, get_multimodal_service
 from app.services.qdrant_service import QdrantIndexService, get_qdrant_service
 from app.services.vlm_service import QwenVLMService, get_vlm_service
+from app.services.rag_service import RAGPipelineService, get_rag_service, build_rag_context
 
 __all__ = [
     "DatasetValidator",
@@ -21,4 +22,8 @@ __all__ = [
     "get_clip_service",
     "MultimodalRetrievalService",
     "get_multimodal_service",
+    "RAGPipelineService",
+    "get_rag_service",
+    "build_rag_context",
 ]
+

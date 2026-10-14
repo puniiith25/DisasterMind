@@ -38,6 +38,19 @@ from app.schemas.retrieval import (
     RetrievalResponse,
 )
 
+from app.schemas.rag import (
+    RAGRequest,
+    EvidenceSnippet,
+    RAGContext,
+    RAGResponse,
+)
+
+from app.services.multimodal_service import (
+    MultimodalRetrievalRequest,
+    FusedEvidenceResult,
+    MultimodalRetrievalResponse,
+)
+
 __all__ = [
     "DisasterM3Record",
     "ValidationIssue",
@@ -62,4 +75,12 @@ __all__ = [
     "IndexBuildReport",
     "RetrievalResult",
     "RetrievalResponse",
+    "RAGRequest",
+    "EvidenceSnippet",
+    "RAGContext",
+    "RAGResponse",
+    "MultimodalRetrievalRequest",
+    "FusedEvidenceResult",
+    "MultimodalRetrievalResponse",
 ]
+
