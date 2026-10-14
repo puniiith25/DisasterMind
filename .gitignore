@@ -25,7 +25,11 @@ var/
 wheels/
 *.egg-info/
 .installed.cfg
-*.egg
+# Frontend / Node
+node_modules/
+**/node_modules/
+Frontend/dist/
+dist/
 
 # Testing & Linting
 .pytest_cache/
