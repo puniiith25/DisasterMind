@@ -124,6 +124,8 @@ class IncidentIntelligenceService:
     def detect_disaster_type(self, text: str, image_path: Optional[str] = None) -> str:
         """Detect disaster type from text query or visual context cues."""
         text_lower = text.lower()
+        if any(w in text_lower for w in ["landslide", "rockfall", "rock fall", "debris", "slope", "mountain", "avalanche", "gyirong", "jilong", "tibet", "nepal"]):
+            return "Landslide & Rockfall"
         if any(w in text_lower for w in ["earthquake", "quake", "tremor", "rubble", "collapse", "antakya", "haiti"]):
             return "Earthquake"
         if any(w in text_lower for w in ["flood", "submerge", "water", "overflow", "river", "libya"]):
@@ -138,6 +140,23 @@ class IncidentIntelligenceService:
             return "Tsunami"
         if any(w in text_lower for w in ["volcano", "eruption", "lava", "ash"]):
             return "Volcano"
+        if any(w in text_lower for w in ["explosion", "blast", "bata", "beirut"]):
+            return "Explosion"
+
+        # Check image filename hints if available
+        if image_path:
+            p_lower = str(image_path).lower()
+            if any(w in p_lower for w in ["landslide", "rock", "mountain"]):
+                return "Landslide & Rockfall"
+            if any(w in p_lower for w in ["explosion", "bata", "beirut"]):
+                return "Explosion"
+            if any(w in p_lower for w in ["fire", "wildfire"]):
+                return "Wildfire"
+            if any(w in p_lower for w in ["flood"]):
+                return "Flood"
+            if any(w in p_lower for w in ["quake", "earthquake"]):
+                return "Earthquake"
+
         return "Disaster Incident"
 
     def parse_structured_breakdown(

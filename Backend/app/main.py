@@ -460,7 +460,7 @@ def analyze_intelligence_json(
     summary="Upload Image & Analyze Incident with Live Internet Search",
     tags=["Intelligence"],
 )
-async def analyze_intelligence_upload(
+def analyze_intelligence_upload(
     question: str = Form(...),
     search_live: bool = Form(True),
     engine_mode: str = Form("fast"),
@@ -479,8 +479,7 @@ async def analyze_intelligence_upload(
             upload_dir.mkdir(parents=True, exist_ok=True)
             saved_path = upload_dir / f"upload_{int(time.time())}_{image.filename}"
             with open(saved_path, "wb") as f:
-                content = await image.read()
-                f.write(content)
+                f.write(image.file.read())
 
         return intelligence_svc.analyze_incident(
             question=question,
