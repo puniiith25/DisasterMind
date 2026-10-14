@@ -1,0 +1,12 @@
+**/.git
+**/.DS_Store
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/venv
+**/.venv
+**/.pytest_cache
+**/node_modules
+**/build
+**/dist
+Backend/data/disasterm3/raw/.cache/

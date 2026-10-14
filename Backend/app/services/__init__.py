@@ -8,6 +8,9 @@ from app.services.multimodal_service import MultimodalRetrievalService, get_mult
 from app.services.qdrant_service import QdrantIndexService, get_qdrant_service
 from app.services.vlm_service import QwenVLMService, get_vlm_service
 from app.services.rag_service import RAGPipelineService, get_rag_service, build_rag_context
+from app.services.grounding_service import GroundingService, get_grounding_service
+from app.services.live_feed_service import LiveFeedService, get_live_feed_service
+from app.services.verification_service import EvidenceVerificationService, get_verification_service
 
 __all__ = [
     "DatasetValidator",
@@ -25,5 +28,12 @@ __all__ = [
     "RAGPipelineService",
     "get_rag_service",
     "build_rag_context",
+    "GroundingService",
+    "get_grounding_service",
+    "LiveFeedService",
+    "get_live_feed_service",
+    "EvidenceVerificationService",
+    "get_verification_service",
 ]
+
 

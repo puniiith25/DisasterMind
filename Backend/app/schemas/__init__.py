@@ -51,6 +51,25 @@ from app.services.multimodal_service import (
     MultimodalRetrievalResponse,
 )
 
+from app.schemas.grounding import (
+    Citation,
+    GroundedClaim,
+    GroundedPrediction,
+    HallucinationRisk,
+)
+
+from app.schemas.live_feed import (
+    LiveDisasterFeedItem,
+    LiveFeedIngestRequest,
+    LiveFeedIngestResponse,
+)
+
+from app.schemas.verification import (
+    VerificationVerdict,
+    ClaimVerificationResult,
+    VerificationReport,
+)
+
 __all__ = [
     "DisasterM3Record",
     "ValidationIssue",
@@ -82,5 +101,16 @@ __all__ = [
     "MultimodalRetrievalRequest",
     "FusedEvidenceResult",
     "MultimodalRetrievalResponse",
+    "Citation",
+    "GroundedClaim",
+    "GroundedPrediction",
+    "HallucinationRisk",
+    "LiveDisasterFeedItem",
+    "LiveFeedIngestRequest",
+    "LiveFeedIngestResponse",
+    "VerificationVerdict",
+    "ClaimVerificationResult",
+    "VerificationReport",
 ]
+
 

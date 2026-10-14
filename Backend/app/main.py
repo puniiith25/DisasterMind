@@ -19,6 +19,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from app.schemas.live_feed import LiveFeedIngestRequest
 from app.schemas.rag import RAGRequest, RAGResponse
 from app.schemas.retrieval import RetrievalResponse
 from app.schemas.vlm import VLMInferenceRequest, VLMInferenceResponse
@@ -74,6 +75,25 @@ def get_vlm() -> QwenVLMService:
     """Dependency that yields the singleton QwenVLMService."""
     from app.services.vlm_service import get_vlm_service
     return get_vlm_service()
+
+
+def get_grounding() -> Any:
+    """Dependency that yields the singleton GroundingService."""
+    from app.services.grounding_service import get_grounding_service
+    return get_grounding_service()
+
+
+def get_live_feed() -> Any:
+    """Dependency that yields the singleton LiveFeedService."""
+    from app.services.live_feed_service import get_live_feed_service
+    return get_live_feed_service()
+
+
+def get_verification() -> Any:
+    """Dependency that yields the singleton EvidenceVerificationService."""
+    from app.services.verification_service import get_verification_service
+    return get_verification_service()
+
 
 
 # ---------------------------------------------------------------------------
@@ -282,3 +302,87 @@ def dataset_statistics() -> Dict[str, Any]:
         "validation_report": val_data,
         "corpus_statistics": corpus_data,
     }
+
+
+# ---------------------------------------------------------------------------
+# Routes: Grounding, Live Feed & Verification (DM-08, DM-09, DM-10)
+# ---------------------------------------------------------------------------
+
+
+class GroundingEvaluationRequest(BaseModel):
+    prediction: str
+    evidence_snippets: list[Any] = Field(default_factory=list)
+
+
+@app.post(
+    "/api/v1/grounding/evaluate",
+    summary="Evaluate Grounding and Extract Citations",
+    tags=["Grounding & Verification"],
+)
+def evaluate_grounding(
+    request: GroundingEvaluationRequest,
+    grounding_svc: Any = Depends(get_grounding),
+) -> Any:
+    """Evaluate prediction against retrieved evidence to compute citation links and hallucination risk."""
+    try:
+        from app.schemas.rag import EvidenceSnippet
+        snippets = [
+            EvidenceSnippet(**s) if isinstance(s, dict) else s
+            for s in request.evidence_snippets
+        ]
+        return grounding_svc.evaluate(request.prediction, snippets)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Grounding evaluation failed: {str(exc)}",
+        ) from exc
+
+
+@app.post(
+    "/api/v1/live/ingest",
+    summary="Ingest Live Disaster Evidence",
+    tags=["Live Feeds"],
+)
+def ingest_live_evidence(
+    request: LiveFeedIngestRequest,
+    live_svc: Any = Depends(get_live_feed),
+    qdrant_svc: QdrantIndexService = Depends(get_qdrant_index),
+) -> Any:
+    """Fetch external live disaster incident bulletins (e.g. USGS) and normalize into evidence corpus."""
+    try:
+        return live_svc.ingest(request, qdrant_service=qdrant_svc)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Live feed ingestion failed: {str(exc)}",
+        ) from exc
+
+
+
+class VerificationCheckRequest(BaseModel):
+    prediction: str
+    evidence_snippets: list[Any] = Field(default_factory=list)
+
+
+@app.post(
+    "/api/v1/verification/verify",
+    summary="Verify Prediction and Detect Contradictions",
+    tags=["Grounding & Verification"],
+)
+def verify_prediction(
+    request: VerificationCheckRequest,
+    verification_svc: Any = Depends(get_verification),
+) -> Any:
+    """Check prediction claims against evidence for factual support, numerical clashes, and contradictions."""
+    try:
+        from app.schemas.rag import EvidenceSnippet
+        snippets = [
+            EvidenceSnippet(**s) if isinstance(s, dict) else s
+            for s in request.evidence_snippets
+        ]
+        return verification_svc.verify(request.prediction, snippets)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Evidence verification failed: {str(exc)}",
+        ) from exc

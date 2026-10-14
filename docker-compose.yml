@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  disastermind-backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: disastermind-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - QDRANT_HOST=disastermind-qdrant
+      - QDRANT_PORT=6333
+    volumes:
+      - ./Backend/data:/app/data
+    depends_on:
+      - disastermind-qdrant
+    networks:
+      - disastermind-net
+
+  disastermind-qdrant:
+    image: qdrant/qdrant:latest
+    container_name: disastermind-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - disastermind-net
+
+  disastermind-frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: disastermind-ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - disastermind-backend
+    networks:
+      - disastermind-net
+
+volumes:
+  qdrant_storage:
+
+networks:
+  disastermind-net:
+    driver: bridge
