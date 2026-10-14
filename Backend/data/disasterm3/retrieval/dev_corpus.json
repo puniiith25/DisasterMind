@@ -1,0 +1,4002 @@
+[
+  {
+    "id": "retrieval_00000",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00001",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00002",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00003",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00004",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00005",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00006",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00007",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00008",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Port facilities, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00009",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Coastline, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00010",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Coastline, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00011",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Roads, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00012",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Coastline, Port facilities",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00013",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Coastline, Port facilities",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00014",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Port facilities, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00015",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Port facilities, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00016",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Port facilities, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00017",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Port facilities, Roads, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00018",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Port facilities, Roads, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00019",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Port facilities, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00020",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Port facilities, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00021",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Coastline, Port facilities",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00022",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Coastline, Port facilities",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00023",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Port facilities, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00024",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Port facilities, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00025",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Coastline, Port facilities",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00026",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Coastline, Port facilities",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00027",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Port facilities, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00028",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Port facilities, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00029",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Port facilities, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00030",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Port facilities, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00031",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00032",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00033",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00034",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00035",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00036",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00037",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00038",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00039",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Port facilities, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00040",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Port facilities, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00041",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00042",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00043",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00044",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00045",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00046",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00047",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00048",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00049",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00050",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00051",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00052",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00053",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00054",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00055",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00056",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00057",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00058",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00059",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00060",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00061",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00062",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00063",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00064",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00065",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00066",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00067",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00068",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00069",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Stadiums, Open-space ground, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00070",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Stadiums, Open-space ground, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00071",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00072",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00073",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00074",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00075",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00076",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00077",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00078",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00079",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00080",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00081",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00082",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00083",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00084",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00085",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00086",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00087",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00088",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00089",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00090",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00091",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00092",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00093",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00094",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00095",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00096",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00097",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00098",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00099",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00100",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00101",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00102",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00103",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00104",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00105",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00106",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00107",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00108",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00109",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00110",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00111",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00112",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00113",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00114",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00115",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00116",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00117",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00118",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00119",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00120",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00121",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00122",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00123",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00124",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00125",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Forest, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00126",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Forest, Mining areas",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00127",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00128",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00129",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00130",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00131",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00132",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00133",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00134",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Open-space ground, Forest, Mining areas",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00135",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Roads, Forest, Mining areas",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00136",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00137",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00138",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00139",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Forest, Roads, Farmland, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00140",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00141",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00142",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00143",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00144",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00145",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00146",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Open-space ground, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00147",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Farmland, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00148",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Open-space ground, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00149",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00150",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00151",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00152",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00153",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00154",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00155",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00156",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00157",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00158",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00159",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00160",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00161",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Coastline, Open-space ground, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00162",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00163",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Open-space ground, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00164",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00165",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00166",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00167",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest, Open-space ground, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00168",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00169",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Farmland, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00170",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00171",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00172",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00173",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00174",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00175",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00176",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00177",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Farmland, Forest, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00178",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00179",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00180",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00181",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00182",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00183",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00184",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00185",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00186",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00187",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00188",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00189",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00190",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00191",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00192",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00193",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00194",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00195",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Farmland, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00196",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00197",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00198",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00199",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Forest, Open-space ground, Farmland, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00200",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00201",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00202",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Open-space ground, Buildings",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00203",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00204",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00205",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00206",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00207",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Forest, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00208",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00209",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00210",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00211",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00212",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00213",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00214",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00215",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00216",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00217",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00218",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00219",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00220",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00221",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00222",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00223",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00224",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00225",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00226",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00227",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00228",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00229",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00230",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00231",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00232",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00233",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00234",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00235",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00236",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00237",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00238",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Forest, Roads, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00239",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00240",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00241",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00242",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00243",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00244",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00245",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00246",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00247",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00248",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00249",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00250",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00251",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00252",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00253",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00254",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00255",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00256",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00257",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00258",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00259",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00260",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00261",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00262",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00263",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00264",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00265",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00266",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00267",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00268",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00269",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00270",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00271",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00272",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Farmland, Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00273",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Farmland, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00274",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Farmland, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00275",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00276",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00277",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00278",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Open-space ground, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00279",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00280",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00281",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00282",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00283",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00284",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Farmland, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00285",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00286",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00287",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Coastline, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00288",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00289",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Open-space ground, Forest, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00290",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00291",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00292",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00293",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Farmland, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00294",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00295",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00296",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Farmland, Open-space ground, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00297",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00298",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00299",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00300",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00301",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Open-space ground, Forest, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00302",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00303",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00304",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00305",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00306",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Roads, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00307",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00308",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00309",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00310",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Farmland, Forest, Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00311",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00312",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00313",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00314",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00315",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Farmland, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00316",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Farmland, Buildings",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00317",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00318",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00319",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00320",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00321",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00322",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Farmland, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00323",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Forest, Roads, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00324",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00325",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00326",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00327",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00328",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Farmland, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00329",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00330",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00331",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00332",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00333",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00334",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00335",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00336",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00337",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00338",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00339",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00340",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00341",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00342",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00343",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00344",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Storage tank, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00345",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Forest, Buildings, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00346",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00347",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00348",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00349",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00350",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00351",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00352",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Storage tank, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00353",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00354",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00355",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00356",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Mining areas, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00357",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00358",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00359",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00360",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Mining areas, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00361",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00362",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00363",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Port facilities, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00364",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00365",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00366",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00367",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00368",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Farmland, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00369",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00370",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00371",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00372",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Storage tank, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00373",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00374",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Coastline, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00375",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00376",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00377",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00378",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Coastline, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00379",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00380",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00381",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Coastline, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00382",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00383",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Port facilities, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00384",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00385",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Open-space ground, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00386",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00387",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00388",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00389",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Coastline",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00390",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00391",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00392",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00393",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00394",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00395",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00396",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00397",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00398",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00399",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00400",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00401",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00402",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00403",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00404",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00405",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00406",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00407",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00408",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00409",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00410",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00411",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00412",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00413",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Open-space ground, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00414",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00415",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00416",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00417",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00418",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00419",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00420",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00421",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00422",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00423",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00424",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00425",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00426",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00427",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00428",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00429",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00430",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00431",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00432",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00433",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00434",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00435",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00436",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00437",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00438",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Roads",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00439",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00440",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00441",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00442",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00443",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00444",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00445",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00446",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00447",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Farmland, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00448",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00449",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00450",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00451",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00452",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00453",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00454",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00455",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00456",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00457",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00458",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00459",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Farmland, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00460",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00461",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00462",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00463",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00464",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00465",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00466",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00467",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00468",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00469",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00470",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00471",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00472",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00473",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00474",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00475",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00476",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00477",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00478",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00479",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00480",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00481",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00482",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00483",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00484",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00485",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00486",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00487",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Roads, Forest, Open-space ground, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00488",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00489",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00490",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What categories of objects have sustained damage in the affected area?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00491",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00492",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00493",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00494",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which critical objects exhibit disaster-related damage?",
+    "answer": "Buildings, Roads, Open-space ground, Forest, Farmland",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00495",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00496",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00497",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "What essential land-cover objects appear damaged in this disaster zone?",
+    "answer": "Buildings, Roads, Forest, Open-space ground",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00498",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Identify the primary objects compromised in this disaster scene.",
+    "answer": "Buildings, Open-space ground, Roads, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  },
+  {
+    "id": "retrieval_00499",
+    "task": "Disaster Bearing Bodies Recognition",
+    "question": "Which key objects show visible impact from this disaster event?",
+    "answer": "Buildings, Roads, Open-space ground, Forest",
+    "source": "DisasterM3",
+    "source_type": "historical"
+  }
+]

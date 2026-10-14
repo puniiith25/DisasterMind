@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-13T14:17:30.752877+00:00",
+  "dataset_path": "/Users/punith25/Desktop/    DisasterMind/Backend/data/disasterm3/disasterm3_qa.json",
+  "total_records": 1599,
+  "valid_records": 1599,
+  "invalid_records": 0,
+  "duplicate_ids_count": 0,
+  "missing_images_count": 0,
+  "task_distribution": {
+    "Disaster Bearing Bodies Recognition": 299,
+    "Building Damage Counting": 300,
+    "Road Damage Counting": 300,
+    "Disaster Scene Recognition": 300,
+    "Disaster Type Recognition": 200,
+    "Relational Reasoning": 200
+  },
+  "image_type_distribution": {
+    "Optical": 1375,
+    "SAR": 224
+  },
+  "issues": [],
+  "summary_status": "PASS"
+}
