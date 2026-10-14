@@ -12,6 +12,7 @@ export default function App() {
   const [searchLiveWeb, setSearchLiveWeb] = useState(true);
   const [intelLoading, setIntelLoading] = useState(false);
   const [intelResult, setIntelResult] = useState(null);
+  const [intelError, setIntelError] = useState(null);
   const fileInputRef = useRef(null);
 
   // RAG query state
@@ -19,6 +20,7 @@ export default function App() {
   const [taskType, setTaskType] = useState('Building Damage Counting');
   const [ragLoading, setRagLoading] = useState(false);
   const [ragResult, setRagResult] = useState(null);
+  const [ragError, setRagError] = useState(null);
 
   // Live feed state
   const [liveItems, setLiveItems] = useState([]);
@@ -61,6 +63,7 @@ export default function App() {
   const handleAnalyzeIntelligence = async () => {
     setIntelLoading(true);
     setIntelResult(null);
+    setIntelError(null);
 
     const formData = new FormData();
     formData.append('question', intelQuestion);
@@ -79,81 +82,21 @@ export default function App() {
         const data = await res.json();
         setIntelResult(data);
       } else {
-        throw new Error('Upload API failed');
+        const err = await res.json().catch(() => ({}));
+        setIntelError(err.detail || `Server error (${res.status}): Failed to execute real vision assessment.`);
       }
-    } catch {
-      // Fallback for demo preview
-      setTimeout(() => {
-        setIntelResult({
-          status: 'SUCCESS',
-          question: intelQuestion,
-          image_analyzed: Boolean(uploadedFile),
-          image_filename: uploadedFile?.name || 'satellite_scene_analysis.png',
-          breakdown: {
-            what_happened: 'A severe seismic catastrophe causing widespread structural collapse, shattered road networks, and dense rubble fields. Multiple residential and commercial complexes suffered progressive shear failure.',
-            where_it_happened: 'Antakya & Hatay Province, Turkey (36.20°N, 36.16°E). High-impact destruction zone concentrated along major river valley fault segments.',
-            how_it_happened: 'Triggered by a shallow strike-slip fault rupture along the East Anatolian Fault Zone, producing peak ground acceleration (PGA) exceeding 1.2g that overwhelmed building shear walls.',
-            impact_and_severity: 'CRITICAL SEVERITY: 45+ collapsed buildings verified in this sector alone, with emergency search and rescue required for trapped survivors.',
-            detected_disaster_type: 'Earthquake',
-            confidence: 0.94,
-          },
-          summary: 'WHAT: Severe Earthquake | WHERE: Antakya, Turkey | HOW: East Anatolian Fault Strike-Slip Rupture',
-          live_internet_evidence: [
-            {
-              source_name: 'USGS Earthquake Hazards Program',
-              source_url: 'https://earthquake.usgs.gov',
-              title: 'M 7.8 - 26 km E of Nurdağı, Turkey',
-              timestamp: 'Real-time Live Feed',
-              snippet: 'Major strike-slip rupture on East Anatolian Fault. Maximum Modified Mercalli Intensity IX (Violent shaking) and widespread structural collapse.',
-              relevance_score: 0.98,
-            },
-            {
-              source_name: 'ReliefWeb / UN OCHA Crisis Report',
-              source_url: 'https://reliefweb.int',
-              title: 'Türkiye / Syria Earthquake Emergency Response Situation Report',
-              timestamp: 'Live Humanitarian Bulletin',
-              snippet: 'Severe urban infrastructure collapse across Hatay and Kahramanmaraş. International search and rescue teams deployed under UNDAC coordination.',
-              relevance_score: 0.93,
-            },
-            {
-              source_name: 'Global Disaster Alert and Coordination System (GDACS)',
-              source_url: 'https://www.gdacs.org',
-              title: 'GDACS Red Alert: Earthquake in Turkey',
-              timestamp: 'Automated Satellite Assessment',
-              snippet: 'Copernicus Emergency Management satellite damage proxy map confirms extreme damage grade across municipal centers.',
-              relevance_score: 0.95,
-            },
-          ],
-          source_provenance: [
-            {
-              source: 'Uploaded Image Visual Feature Extraction',
-              details: uploadedFile ? `Extracted building damage & rubble telemetry from ${uploadedFile.name}` : 'Multi-temporal aerial imagery analysis',
-              verified: true,
-            },
-            {
-              source: 'Real-time Live Internet Feeds (USGS / ReliefWeb / GDACS)',
-              details: 'Cross-referenced against active global disaster telemetry APIs',
-              verified: true,
-            },
-            {
-              source: 'DisasterMind Verified Evidence Corpus',
-              details: 'Validated against 1,263 DisasterM3 historical records and local Qdrant vectors',
-              verified: true,
-            },
-          ],
-          latency_ms: 45.2,
-        });
-        setIntelLoading(false);
-      }, 600);
-      return;
+    } catch (err) {
+      setIntelError(`Connection failed: Unable to reach backend server at http://localhost:8000. ${err.message}`);
+    } finally {
+      setIntelLoading(false);
     }
-    setIntelLoading(false);
   };
 
   // Run Classic RAG
   const handleRunRAG = async () => {
     setRagLoading(true);
     setRagResult(null);
+    setRagError(null);
 
     try {
       const res = await fetch('/api/v1/rag/predict', {
@@ -170,36 +113,15 @@ export default function App() {
       if (res.ok) {
         const data = await res.json();
         setRagResult(data);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setRagError(err.detail || `Server returned status ${res.status}`);
       }
-    } catch {
-      // Fallback
-      setTimeout(() => {
-        setRagResult({
-          question: ragQuestion,
-          prediction: 'Satellite optical imagery and ground telemetry confirm 45 collapsed buildings and 12 compromised structures.',
-          status: 'SUCCESS',
-          retrieval_mode: 'multimodal_rrf',
-          evidence_count: 2,
-          evidence_snippets: [
-            {
-              rank: 1,
-              evidence_id: 'evi_4a3e69afcd38',
-              task_type: 'Building Damage Counting',
-              source_type: 'qa',
-              question: 'How many buildings collapsed?',
-              answer: '45 collapsed buildings identified in post-disaster survey.',
-              rrf_score: 0.032,
-            },
-          ],
-          total_latency_ms: 78.5,
-          vlm_model_id: 'Qwen2.5-VL-3B-Instruct',
-          device: 'Apple MPS',
-        });
-        setRagLoading(false);
-      }, 400);
-      return;
+    } catch (err) {
+      setRagError(`Connection error: ${err.message}`);
+    } finally {
+      setRagLoading(false);
     }
-    setRagLoading(false);
   };
 
   const handleFetchLiveFeeds = async () => {
@@ -208,23 +130,17 @@ export default function App() {
       const res = await fetch('/api/v1/live/ingest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feed_source: 'usgs', limit: 4, auto_index: false }),
+        body: JSON.stringify({ feed_source: 'usgs', limit: 6, auto_index: false }),
       });
       if (res.ok) {
         const data = await res.json();
         setLiveItems(data.items || []);
       }
-    } catch {
-      setLiveItems([
-        {
-          title: 'M 6.8 - Off coast of Honshu, Japan',
-          severity: 'CRITICAL',
-          timestamp: 'Just now',
-          summary: 'Shallow subduction zone earthquake detected. Coastal tsunami watches issued.',
-        },
-      ]);
+    } catch (err) {
+      console.error('Failed to fetch live feeds:', err);
+    } finally {
+      setFetchingFeed(false);
     }
-    setFetchingFeed(false);
   };
 
   return (
@@ -455,6 +371,12 @@ export default function App() {
 
           {/* Results Intelligence Display */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {intelError && (
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', borderRadius: '8px', padding: '1rem', color: '#fca5a5', fontSize: '0.88rem' }}>
+                ⚠️ <strong>Analysis Error:</strong> {intelError}
+              </div>
+            )}
+
             {intelResult ? (
               <>
                 {/* 1. Incident Breakdown Card */}
@@ -609,6 +531,11 @@ export default function App() {
           </div>
 
           <div>
+            {ragError && (
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', borderRadius: '8px', padding: '1rem', color: '#fca5a5', marginBottom: '1rem', fontSize: '0.88rem' }}>
+                ⚠️ <strong>Query Error:</strong> {ragError}
+              </div>
+            )}
             {ragResult && (
               <div className="glass-panel" style={{ padding: '1.75rem' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem' }}>RAG Prediction</h3>

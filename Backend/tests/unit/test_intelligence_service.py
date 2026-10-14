@@ -14,9 +14,31 @@ from app.services.intelligence_service import (
 )
 
 
+from unittest.mock import MagicMock
+from app.schemas.vlm import VLMInferenceResponse
+
+
 @pytest.fixture
-def intelligence_service():
-    return IncidentIntelligenceService()
+def mock_vlm():
+    mock = MagicMock()
+    mock.generate.return_value = VLMInferenceResponse(
+        prediction=(
+            "WHAT: Severe earthquake structural collapse observed across buildings.\n"
+            "WHERE: Antakya, Turkey disaster sector.\n"
+            "HOW: Triggered by strike-slip fault rupture exceeding shear strength.\n"
+            "IMPACT: Massive building collapse and emergency priority."
+        ),
+        device="mps",
+        tokens_generated=32,
+        latency_ms=45.2,
+        model_id="Qwen/Qwen2.5-VL-3B-Instruct",
+    )
+    return mock
+
+
+@pytest.fixture
+def intelligence_service(mock_vlm):
+    return IncidentIntelligenceService(vlm_service=mock_vlm)
 
 
 def test_detect_disaster_type(intelligence_service):
