@@ -52,7 +52,8 @@ model_cache/
 models/
 checkpoints/
 Backend/data/disasterm3/.cache/
-Backend/data/disasterm3/raw/.cache/
+Backend/data/disasterm3/raw/
+
 
 # Local Vector Store & Databases
 Backend/data/qdrant/
