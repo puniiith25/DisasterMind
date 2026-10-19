@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -457,33 +457,47 @@ def analyze_intelligence_json(
 
 @app.post(
     "/api/v1/intelligence/analyze-upload",
-    summary="Upload Image & Analyze Incident with Live Internet Search",
+    summary="Upload Image(s) & Analyze Incident with Live Internet Search",
     tags=["Intelligence"],
 )
 def analyze_intelligence_upload(
     question: str = Form(...),
     search_live: bool = Form(True),
-    engine_mode: str = Form("fast"),
+    engine_mode: str = Form("deep_vlm"),
+    images: List[UploadFile] = File(default=[]),
     image: Optional[UploadFile] = File(None),
     intelligence_svc: Any = Depends(get_intelligence),
 ) -> Any:
     """
-    Accepts user uploaded image + natural language question.
-    Determines WHAT is happening, WHERE, HOW, and retrieves real-time live internet evidence.
+    Accepts user uploaded image(s) + natural language question.
+    Processes all uploaded scenes, performs real-time visual reasoning and live internet cross-correlation.
     """
-    saved_path = None
+    saved_paths: List[str] = []
     try:
         import time
+        upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        now_ts = int(time.time())
+
+        # Collect all uploads (both multi-file and single-file)
+        all_uploads: List[UploadFile] = []
+        if images:
+            all_uploads.extend(images)
         if image and image.filename:
-            upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
-            upload_dir.mkdir(parents=True, exist_ok=True)
-            saved_path = upload_dir / f"upload_{int(time.time())}_{image.filename}"
-            with open(saved_path, "wb") as f:
-                f.write(image.file.read())
+            all_uploads.append(image)
+
+        for i, up in enumerate(all_uploads):
+            if up and up.filename:
+                safe_name = f"upload_{now_ts}_{i}_{up.filename}"
+                p = upload_dir / safe_name
+                with open(p, "wb") as f:
+                    f.write(up.file.read())
+                saved_paths.append(str(p))
 
         return intelligence_svc.analyze_incident(
             question=question,
-            image_path=str(saved_path) if saved_path else None,
+            image_path=saved_paths[0] if saved_paths else None,
+            image_paths=saved_paths if saved_paths else None,
             search_live=search_live,
             engine_mode=engine_mode,
         )

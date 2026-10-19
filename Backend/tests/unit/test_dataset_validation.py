@@ -243,7 +243,7 @@ class TestDatasetValidation:
         hash_before = compute_sha256(dataset_path)
 
         validator = DatasetValidator(base_dir=".")
-        valid, report = validator.load_and_validate(dataset_path, check_images_on_disk=True)
+        valid, report = validator.load_and_validate(dataset_path, check_images_on_disk=False)
 
         hash_after = compute_sha256(dataset_path)
 

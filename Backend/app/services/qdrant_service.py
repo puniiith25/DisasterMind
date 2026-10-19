@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-DEFAULT_COLLECTION = "disasterm3_text"
+DEFAULT_COLLECTION = "disasterm3_historical"
 DEFAULT_VECTOR_SIZE = 1024
 DEFAULT_DISTANCE = Distance.COSINE
 DEFAULT_BATCH_SIZE = 16
@@ -224,8 +224,15 @@ class QdrantIndexService:
 
         query_vector = self._embedding_service.embed_text(query)
 
+        coll = self.collection_name
+        if not client.collection_exists(collection_name=coll):
+            if client.collection_exists(collection_name="disasterm3_historical"):
+                coll = "disasterm3_historical"
+            elif client.collection_exists(collection_name="disasterm3_text"):
+                coll = "disasterm3_text"
+
         hits = client.query_points(
-            collection_name=self.collection_name,
+            collection_name=coll,
             query=query_vector,
             limit=top_k,
         ).points
@@ -239,11 +246,11 @@ class QdrantIndexService:
                 RetrievalResult(
                     rank=rank,
                     score=float(hit.score),
-                    evidence_id=p.get("evidence_id", ""),
-                    record_id=p.get("record_id", ""),
-                    task_type=p.get("task_type", ""),
-                    source_type=p.get("source_type", ""),
-                    text=p.get("text", ""),
+                    evidence_id=str(p.get("evidence_id") or p.get("id") or hit.id),
+                    record_id=str(p.get("record_id") or p.get("id") or hit.id),
+                    task_type=p.get("task_type") or p.get("task") or "",
+                    source_type=p.get("source_type") or p.get("source") or "historical",
+                    text=p.get("text") or f"{p.get('question', '')} -> {p.get('answer', '')}",
                     question=p.get("question", ""),
                     answer=p.get("answer", ""),
                     disaster_type=p.get("disaster_type"),

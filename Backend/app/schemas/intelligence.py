@@ -34,6 +34,8 @@ class IntelligenceResponse(BaseModel):
     question: str
     image_analyzed: bool = True
     image_filename: Optional[str] = None
+    image_filenames: List[str] = Field(default_factory=list)
+    images_analyzed_count: int = 0
     summary: str
     breakdown: IncidentBreakdown
     live_internet_evidence: List[LiveInternetEvidenceItem] = Field(default_factory=list)

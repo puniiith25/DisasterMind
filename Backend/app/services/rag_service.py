@@ -278,24 +278,15 @@ def get_rag_service(
 ) -> RAGPipelineService:
     global _RAG_SERVICE_INSTANCE
     if _RAG_SERVICE_INSTANCE is None:
-        from app.services.multimodal_service import MultimodalRetrievalService
-        from app.services.qdrant_service import QdrantIndexService
-        from app.services.clip_service import CLIPImageService
-        from app.services.embedding_service import BGEM3EmbeddingService
-        from app.services.vlm_service import QwenVLMService
+        from app.services.multimodal_service import get_multimodal_service
+        from app.services.vlm_service import get_vlm_service
 
-        emb_svc = BGEM3EmbeddingService(device=embedding_device)
-        qdrant_svc = QdrantIndexService(
+        mm_svc = get_multimodal_service(
             qdrant_path=qdrant_path,
             collection_name=collection_name,
-            embedding_service=emb_svc,
+            device=clip_device,
         )
-        clip_svc = CLIPImageService(device=clip_device)
-        mm_svc = MultimodalRetrievalService(
-            qdrant_service=qdrant_svc,
-            clip_service=clip_svc,
-        )
-        vlm_svc = QwenVLMService(device=vlm_device)
+        vlm_svc = get_vlm_service(device=vlm_device)
 
         _RAG_SERVICE_INSTANCE = RAGPipelineService(
             retrieval_service=mm_svc,

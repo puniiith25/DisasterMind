@@ -21,6 +21,9 @@ import torch
 
 from app.schemas.vlm import VLMInferenceRequest, VLMInferenceResponse
 
+import os
+os.environ.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "0.0")
+
 logger = logging.getLogger(__name__)
 
 
@@ -75,11 +78,26 @@ class QwenVLMService:
         start_time = time.perf_counter()
         logger.info(f"Loading Qwen2.5-VL from '{self.model_id}' onto {self.device}...")
 
-        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            self.model_id,
-            torch_dtype=self.torch_dtype,
-        ).to(self.device)
-        self.model.eval()
+        try:
+            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                self.model_id,
+                torch_dtype=self.torch_dtype,
+                low_cpu_mem_usage=True,
+            ).to(self.device)
+            self.model.eval()
+        except Exception as load_err:
+            if self.device != "cpu":
+                logger.warning(f"Could not load onto {self.device} ({load_err}). Falling back to CPU for real inference...")
+                self.device = "cpu"
+                self.torch_dtype = torch.float32
+                self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                    self.model_id,
+                    torch_dtype=self.torch_dtype,
+                    low_cpu_mem_usage=True,
+                ).to("cpu")
+                self.model.eval()
+            else:
+                raise load_err
 
         self.processor = AutoProcessor.from_pretrained(
             self.model_id,
@@ -107,12 +125,33 @@ class QwenVLMService:
         pre_image_path: Optional[str] = None,
         post_image_path: Optional[str] = None,
         image_path: Optional[str] = None,
+        image_paths: Optional[List[str]] = None,
     ) -> Tuple[List[Dict[str, Any]], List[Image.Image]]:
         """Validate paths, load PIL images, and format chat template messages."""
         content: List[Dict[str, Any]] = []
         loaded_images: List[Image.Image] = []
 
-        if pre_image_path and post_image_path:
+        # Multi-image case (2 or more photos / drone captures / satellite views)
+        if image_paths and len(image_paths) >= 2:
+            for p in image_paths:
+                path_obj = Path(p).resolve()
+                if not path_obj.exists():
+                    logger.warning(f"Image not found: {p}")
+                    continue
+                try:
+                    img = Image.open(path_obj).convert("RGB")
+                    loaded_images.append(img)
+                    content.append({"type": "image", "image": img})
+                except Exception as err:
+                    logger.warning(f"Error loading image {p}: {err}")
+
+            instruction = (
+                f"Examine all {len(loaded_images)} disaster scene images carefully and analyze visual changes, damage, and evidence.\n\n"
+                f"Question: {question.strip()}"
+            )
+            content.append({"type": "text", "text": instruction})
+
+        elif pre_image_path and post_image_path:
             # Bi-temporal case
             for label, p in [("pre-disaster", pre_image_path), ("post-disaster", post_image_path)]:
                 path_obj = Path(p).resolve()
@@ -128,9 +167,9 @@ class QwenVLMService:
             )
             content.append({"type": "text", "text": instruction})
 
-        elif image_path or post_image_path or pre_image_path:
+        elif image_path or (image_paths and len(image_paths) == 1) or post_image_path or pre_image_path:
             # Single image case
-            single_p = image_path or post_image_path or pre_image_path
+            single_p = image_path or (image_paths[0] if image_paths else None) or post_image_path or pre_image_path
             path_obj = Path(single_p).resolve()  # type: ignore[arg-type]
             if not path_obj.exists():
                 raise FileNotFoundError(f"Image not found: {single_p}")
@@ -169,6 +208,7 @@ class QwenVLMService:
                 pre_image_path=request.pre_image_path,
                 post_image_path=request.post_image_path,
                 image_path=request.image_path,
+                image_paths=request.image_paths,
             )
 
             prompt_text = self.processor.apply_chat_template(

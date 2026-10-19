@@ -5,15 +5,15 @@ export default function App() {
   const [healthStatus, setHealthStatus] = useState({ online: false, points: 0 });
   const [stats, setStats] = useState(null);
 
-  // Intelligence State (User Upload + Live Internet Evidence)
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  // Intelligence State (Multiple User Uploads + Live Internet Evidence)
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [previewItems, setPreviewItems] = useState([]);
   const [intelQuestion, setIntelQuestion] = useState('What disaster is happening here, where did it occur, what caused it, and what is the damage?');
   const [searchLiveWeb, setSearchLiveWeb] = useState(true);
   const [intelLoading, setIntelLoading] = useState(false);
   const [intelResult, setIntelResult] = useState(null);
   const [intelError, setIntelError] = useState(null);
-  const [engineMode, setEngineMode] = useState('fast');
+  const [engineMode, setEngineMode] = useState('deep_vlm');
   const fileInputRef = useRef(null);
 
   // RAG query state
@@ -44,23 +44,38 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  // Handle Image File Selection
+  // Handle Multiple Image File Selection
   const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+    const selected = Array.from(e.target.files || []);
+    if (selected.length > 0) {
+      setUploadedFiles(prev => [...prev, ...selected]);
+      const newPreviews = selected.map(f => ({
+        name: f.name,
+        size: (f.size / (1024 * 1024)).toFixed(2) + ' MB',
+        url: URL.createObjectURL(f),
+      }));
+      setPreviewItems(prev => [...prev, ...newPreviews]);
       setIntelResult(null);
     }
-  };
-
-  const handleClearImage = () => {
-    setUploadedFile(null);
-    setPreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Run Image & Incident Intelligence Analysis
+  const handleRemoveFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewItems(prev => {
+      URL.revokeObjectURL(prev[index]?.url);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleClearImages = () => {
+    previewItems.forEach(item => URL.revokeObjectURL(item.url));
+    setUploadedFiles([]);
+    setPreviewItems([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Run Image & Incident Intelligence Analysis (Multi-Image Enabled)
   const handleAnalyzeIntelligence = async () => {
     setIntelLoading(true);
     setIntelResult(null);
@@ -70,8 +85,13 @@ export default function App() {
     formData.append('question', intelQuestion);
     formData.append('search_live', searchLiveWeb);
     formData.append('engine_mode', engineMode);
-    if (uploadedFile) {
-      formData.append('image', uploadedFile);
+    
+    // Append all selected images
+    uploadedFiles.forEach(file => {
+      formData.append('images', file);
+    });
+    if (uploadedFiles[0]) {
+      formData.append('image', uploadedFiles[0]);
     }
 
     try {
@@ -228,20 +248,32 @@ export default function App() {
           {/* Upload & Input Panel */}
           <div className="glass-panel" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--accent-blue)', marginBottom: '0.35rem' }}>
-                1. Upload Disaster Scene Image
-              </h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--accent-blue)', margin: 0 }}>
+                  1. Upload Disaster Scene Imagery ({uploadedFiles.length})
+                </h2>
+                {uploadedFiles.length > 0 && (
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem', color: '#f43f5e' }}
+                    onClick={handleClearImages}
+                  >
+                    ✕ Clear All
+                  </button>
+                )}
+              </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
-                Upload any satellite image, drone capture, aerial photo, or scene observation.
+                Upload multiple satellite images, pre/post disaster pairs, drone captures, or street-level photos.
               </p>
             </div>
 
-            {/* Drag & Drop Upload Box */}
+            {/* Drag & Drop Multi-Image Upload Box */}
             <div
               style={{
                 border: '2px dashed var(--border-color)',
                 borderRadius: '12px',
-                padding: '1.5rem',
+                padding: '1.25rem',
                 textAlign: 'center',
                 background: 'rgba(0, 0, 0, 0.25)',
                 cursor: 'pointer',
@@ -249,55 +281,125 @@ export default function App() {
                 transition: 'all 0.2s ease',
               }}
               onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                  handleFileChange({ target: { files: e.dataTransfer.files } });
+                }
+              }}
             >
               <input
                 ref={fileInputRef}
                 type="file"
+                multiple
                 accept="image/*"
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
               />
 
-              {previewUrl ? (
-                <div>
-                  <img
-                    src={previewUrl}
-                    alt="Upload Preview"
+              <div style={{ padding: '0.5rem 0' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.35rem' }}>📥</div>
+                <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.92rem', marginBottom: '0.25rem' }}>
+                  Click to select or drag & drop multiple disaster images
+                </div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                  Select multiple files at once • PNG, JPG, JPEG, WebP, GeoTIFF
+                </div>
+              </div>
+            </div>
+
+            {/* Multi-Image Preview Gallery Grid */}
+            {previewItems.length > 0 && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
+                gap: '0.75rem',
+                maxHeight: '260px',
+                overflowY: 'auto',
+                padding: '0.5rem',
+                background: 'rgba(0,0,0,0.3)',
+                borderRadius: '8px',
+                border: '1px solid var(--border-color)'
+              }}>
+                {previewItems.map((item, idx) => (
+                  <div
+                    key={idx}
                     style={{
-                      maxHeight: '220px',
-                      maxWidth: '100%',
-                      borderRadius: '8px',
-                      objectFit: 'contain',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                      marginBottom: '0.75rem',
+                      position: 'relative',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      display: 'flex',
+                      flexDirection: 'column',
                     }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.82rem', color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>
-                      {uploadedFile?.name}
-                    </span>
+                  >
+                    <img
+                      src={item.url}
+                      alt={`Upload ${idx + 1}`}
+                      style={{
+                        width: '100%',
+                        height: '85px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <div style={{
+                      padding: '0.3rem',
+                      fontSize: '0.7rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.1rem',
+                      background: 'rgba(0,0,0,0.6)'
+                    }}>
+                      <span
+                        title={item.name}
+                        style={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          color: '#38bdf8',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {item.name}
+                      </span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>
+                        {item.size}
+                      </span>
+                    </div>
                     <button
                       type="button"
-                      className="btn-secondary"
-                      style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem', color: '#f43f5e' }}
-                      onClick={(e) => { e.stopPropagation(); handleClearImage(); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFile(idx);
+                      }}
+                      title="Remove image"
+                      style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        background: 'rgba(239, 68, 68, 0.85)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer',
+                        fontSize: '0.7rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        lineHeight: 1,
+                      }}
                     >
-                      ✕ Remove
+                      ✕
                     </button>
                   </div>
-                </div>
-              ) : (
-                <div style={{ padding: '1.5rem 0' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📥</div>
-                  <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '0.25rem' }}>
-                    Click or drop image file here
-                  </div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-                    Supports PNG, JPG, JPEG, WebP, Satellite Geotiff
-                  </div>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Question Input */}
             <div>
@@ -429,14 +531,19 @@ export default function App() {
               <>
                 {/* 1. Incident Breakdown Card */}
                 <div className="glass-panel" style={{ padding: '1.75rem', borderLeft: '4px solid #38bdf8' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <span className="badge badge-danger" style={{ fontSize: '0.8rem' }}>
                         🚨 {intelResult.breakdown?.detected_disaster_type}
                       </span>
                       <span className="badge badge-success">
                         {(intelResult.breakdown?.confidence * 100).toFixed(0)}% Confidence
                       </span>
+                      {intelResult.images_analyzed_count > 0 && (
+                        <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>
+                          📸 {intelResult.images_analyzed_count} {intelResult.images_analyzed_count === 1 ? 'Image' : 'Images'} Analyzed
+                        </span>
+                      )}
                     </div>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                       Response: {intelResult.latency_ms} ms

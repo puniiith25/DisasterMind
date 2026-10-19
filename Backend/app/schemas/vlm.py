@@ -14,7 +14,8 @@ class VLMInferenceRequest(BaseModel):
     pre_image_path: Optional[str] = Field(None, description="Path to pre-disaster image")
     post_image_path: Optional[str] = Field(None, description="Path to post-disaster image")
     image_path: Optional[str] = Field(None, description="Path to single image")
-    max_new_tokens: int = Field(default=64, ge=1, le=512, description="Maximum tokens to generate")
+    image_paths: Optional[List[str]] = Field(default=None, description="Paths to multiple disaster images")
+    max_new_tokens: int = Field(default=128, ge=1, le=512, description="Maximum tokens to generate")
     temperature: float = Field(default=0.0, ge=0.0, le=2.0, description="Generation temperature")
 
 

@@ -366,10 +366,10 @@ def get_multimodal_service(
 ) -> MultimodalRetrievalService:
     global _MULTIMODAL_SERVICE_INSTANCE
     if _MULTIMODAL_SERVICE_INSTANCE is None:
-        from app.services.qdrant_service import QdrantIndexService
+        from app.services.qdrant_service import get_qdrant_service
         from app.services.clip_service import CLIPImageService
 
-        qdrant_svc = QdrantIndexService(
+        qdrant_svc = get_qdrant_service(
             qdrant_path=qdrant_path,
             collection_name=collection_name,
         )

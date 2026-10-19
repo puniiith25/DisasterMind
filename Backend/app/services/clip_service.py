@@ -25,12 +25,11 @@ logger = logging.getLogger(__name__)
 
 def select_clip_device(preferred: str = "auto") -> str:
     pref = preferred.lower().strip()
-    if pref != "auto":
+    if pref not in ("auto", ""):
         return pref
-    if torch.backends.mps.is_available():
-        return "mps"
     if torch.cuda.is_available():
         return "cuda"
+    # CPU is fast (<20ms) for CLIP-ViT and avoids Apple Silicon MPS synchronization deadlocks
     return "cpu"
 
 
