@@ -230,6 +230,15 @@ class QdrantIndexService:
                 coll = "disasterm3_historical"
             elif client.collection_exists(collection_name="disasterm3_text"):
                 coll = "disasterm3_text"
+            else:
+                latency_ms = (time.perf_counter() - start_time) * 1000.0
+                return RetrievalResponse(
+                    query=query,
+                    top_k=top_k,
+                    collection_name=self.collection_name,
+                    results=[],
+                    latency_ms=latency_ms,
+                )
 
         hits = client.query_points(
             collection_name=coll,

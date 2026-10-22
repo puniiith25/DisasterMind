@@ -4,6 +4,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('intelligence');
   const [healthStatus, setHealthStatus] = useState({ online: false, points: 0 });
   const [stats, setStats] = useState(null);
+  const [engineMode, setEngineMode] = useState('deep_vlm'); // 'deep_vlm' for neural reasoning on MPS, 'fast' for instant CLIP zero-shot (<30ms)
+  const [vlmStatus, setVlmStatus] = useState({ ready: false, is_loading: false, device: 'mps' });
 
   // Intelligence State (Multiple User Uploads + Live Internet Evidence)
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -26,7 +28,7 @@ export default function App() {
   const [liveItems, setLiveItems] = useState([]);
   const [fetchingFeed, setFetchingFeed] = useState(false);
 
-  // Check health on load
+  // Check health and VLM status on load
   useEffect(() => {
     fetch('/health')
       .then(res => res.json())
@@ -36,6 +38,11 @@ export default function App() {
       .catch(() => {
         setHealthStatus({ online: true, points: 1263 });
       });
+
+    fetch('/api/v1/vlm/status')
+      .then(res => res.json())
+      .then(data => setVlmStatus(data))
+      .catch(() => {});
 
     fetch('/api/v1/dataset/stats')
       .then(res => res.json())
@@ -83,7 +90,7 @@ export default function App() {
     const formData = new FormData();
     formData.append('question', intelQuestion);
     formData.append('search_live', searchLiveWeb);
-    formData.append('engine_mode', 'deep_vlm');
+    formData.append('engine_mode', engineMode);
     
     // Append all selected images
     uploadedFiles.forEach(file => {
@@ -181,12 +188,23 @@ export default function App() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="glass-panel" style={{ padding: '0.6rem 1.2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <span style={{ fontSize: '0.85rem' }}>{vlmStatus.ready ? '🟢' : '⚡'}</span>
+            <div style={{ fontSize: '0.78rem' }}>
+              <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                {vlmStatus.ready ? `VLM Ready (${vlmStatus.device?.toUpperCase()})` : 'Instant Engine Active'}
+              </div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                {vlmStatus.ready ? 'Qwen2.5-VL 3B' : 'CLIP & Live Telemetry'}
+              </div>
+            </div>
+          </div>
+          <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span className="live-indicator" />
-            <div style={{ fontSize: '0.8rem' }}>
+            <div style={{ fontSize: '0.78rem' }}>
               <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>System Live</div>
-              <div style={{ color: 'var(--text-muted)' }}>{healthStatus.points} Qdrant vectors</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>{healthStatus.points} Qdrant vectors</div>
             </div>
           </div>
         </div>
@@ -435,6 +453,67 @@ export default function App() {
               <label htmlFor="searchLive" style={{ fontSize: '0.85rem', color: '#e0f2fe', cursor: 'pointer', userSelect: 'none' }}>
                 <strong>Correlate with Live Internet Disaster Feeds</strong> (USGS Seismic, ReliefWeb, GDACS Satellite Alerts)
               </label>
+            </div>
+
+            {/* Reasoning Engine Mode Switcher */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.7)',
+              padding: '0.85rem 1rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}>
+              <div>
+                <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span>{engineMode === 'fast' ? '⚡' : '🧠'}</span>
+                  <span>Reasoning Engine</span>
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
+                  {engineMode === 'fast'
+                    ? 'Instant (<30ms) Zero-Shot CLIP-ViT visual feature classification'
+                    : 'Deep Multimodal Neural Reasoning via local Qwen2.5-VL on Apple Silicon MPS'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(0,0,0,0.5)', padding: '3px', borderRadius: '7px' }}>
+                <button
+                  type="button"
+                  onClick={() => setEngineMode('fast')}
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    fontSize: '0.78rem',
+                    borderRadius: '5px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: engineMode === 'fast' ? '#0284c7' : 'transparent',
+                    color: engineMode === 'fast' ? '#fff' : 'var(--text-muted)',
+                    fontWeight: engineMode === 'fast' ? 600 : 400,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  ⚡ Fast CLIP (&lt;30ms)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEngineMode('deep_vlm')}
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    fontSize: '0.78rem',
+                    borderRadius: '5px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: engineMode === 'deep_vlm' ? '#6366f1' : 'transparent',
+                    color: engineMode === 'deep_vlm' ? '#fff' : 'var(--text-muted)',
+                    fontWeight: engineMode === 'deep_vlm' ? 600 : 400,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  🧠 Deep VLM
+                </button>
+              </div>
             </div>
 
             {/* Quick Demo Pre-sets */}

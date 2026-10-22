@@ -190,6 +190,21 @@ def health(
     )
 
 
+@app.get("/api/v1/vlm/status", tags=["General"])
+def vlm_status(
+    vlm_svc: QwenVLMService = Depends(get_vlm),
+) -> Dict[str, Any]:
+    """Return Vision-Language model readiness and runtime accelerator device."""
+    ready = getattr(vlm_svc, "is_ready", lambda: getattr(vlm_svc, "is_loaded", False))()
+    return {
+        "ready": ready,
+        "is_loading": getattr(vlm_svc, "_is_loading", False),
+        "device": getattr(vlm_svc, "device", "auto"),
+        "model_id": getattr(vlm_svc, "model_id", "Qwen/Qwen2.5-VL-3B-Instruct"),
+        "load_time_seconds": round(getattr(vlm_svc, "load_time_seconds", 0.0), 2),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Routes: Multimodal RAG Pipeline (DM-07 / DM-08)
 # ---------------------------------------------------------------------------

@@ -66,48 +66,57 @@ class QwenVLMService:
         self.model: Any = None
         self.processor: Any = None
         self.is_loaded: bool = False
+        self._is_loading: bool = False
         self.load_time_seconds: float = 0.0
+
+    def is_ready(self) -> bool:
+        """Check if model and processor are initialized and ready for inference."""
+        return self.is_loaded and self.model is not None and self.processor is not None
 
     def load_model(self) -> None:
         """Load model and processor into memory if not already initialized."""
-        if self.is_loaded and self.model is not None and self.processor is not None:
+        if self.is_ready():
+            return
+        if self._is_loading:
             return
 
+        self._is_loading = True
         from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
         start_time = time.perf_counter()
         logger.info(f"Loading Qwen2.5-VL from '{self.model_id}' onto {self.device}...")
 
         try:
-            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-                self.model_id,
-                torch_dtype=self.torch_dtype,
-                low_cpu_mem_usage=True,
-            ).to(self.device)
-            self.model.eval()
-        except Exception as load_err:
-            if self.device != "cpu":
-                logger.warning(f"Could not load onto {self.device} ({load_err}). Falling back to CPU for real inference...")
-                self.device = "cpu"
-                self.torch_dtype = torch.float32
+            try:
                 self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                     self.model_id,
                     torch_dtype=self.torch_dtype,
-                    low_cpu_mem_usage=True,
-                ).to("cpu")
+                ).to(self.device)
                 self.model.eval()
-            else:
-                raise load_err
+            except Exception as load_err:
+                if self.device != "cpu":
+                    logger.warning(f"Could not load onto {self.device} ({load_err}). Falling back to CPU...")
+                    self.device = "cpu"
+                    self.torch_dtype = torch.float32
+                    self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                        self.model_id,
+                        torch_dtype=self.torch_dtype,
+                    ).to("cpu")
+                    self.model.eval()
+                else:
+                    raise load_err
 
-        self.processor = AutoProcessor.from_pretrained(
-            self.model_id,
-            min_pixels=self.min_pixels,
-            max_pixels=self.max_pixels,
-        )
+            self.processor = AutoProcessor.from_pretrained(
+                self.model_id,
+                min_pixels=self.min_pixels,
+                max_pixels=self.max_pixels,
+            )
 
-        self.load_time_seconds = time.perf_counter() - start_time
-        self.is_loaded = True
-        logger.info(f"Qwen2.5-VL loaded successfully in {self.load_time_seconds:.2f}s")
+            self.load_time_seconds = time.perf_counter() - start_time
+            self.is_loaded = True
+            logger.info(f"Qwen2.5-VL loaded successfully in {self.load_time_seconds:.2f}s")
+        finally:
+            self._is_loading = False
 
     def unload_model(self) -> None:
         """Release model weights and clear accelerator cache."""

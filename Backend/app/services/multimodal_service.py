@@ -61,7 +61,7 @@ class FusedEvidenceResult(BaseModel):
     disaster_type: Optional[str] = None
     location: Optional[str] = None
     has_images: bool = False
-    image_paths: List[str] = Field(default_factory=list)
+    image_paths: List[Any] = Field(default_factory=list)
 
 
 class MultimodalRetrievalResponse(BaseModel):
