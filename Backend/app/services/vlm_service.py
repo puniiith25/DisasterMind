@@ -22,7 +22,9 @@ import torch
 from app.schemas.vlm import VLMInferenceRequest, VLMInferenceResponse
 
 import os
+import threading
 os.environ.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "0.0")
+os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +69,7 @@ class QwenVLMService:
         self.processor: Any = None
         self.is_loaded: bool = False
         self._is_loading: bool = False
+        self._lock = threading.Lock()
         self.load_time_seconds: float = 0.0
 
     def is_ready(self) -> bool:
@@ -75,48 +78,49 @@ class QwenVLMService:
 
     def load_model(self) -> None:
         """Load model and processor into memory if not already initialized."""
-        if self.is_ready():
-            return
-        if self._is_loading:
-            return
+        with self._lock:
+            if self.is_ready():
+                return
+            if self._is_loading:
+                return
 
-        self._is_loading = True
-        from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
+            self._is_loading = True
+            from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
-        start_time = time.perf_counter()
-        logger.info(f"Loading Qwen2.5-VL from '{self.model_id}' onto {self.device}...")
+            start_time = time.perf_counter()
+            logger.info(f"Loading Qwen2.5-VL from '{self.model_id}' onto {self.device}...")
 
-        try:
             try:
-                self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-                    self.model_id,
-                    torch_dtype=self.torch_dtype,
-                ).to(self.device)
-                self.model.eval()
-            except Exception as load_err:
-                if self.device != "cpu":
-                    logger.warning(f"Could not load onto {self.device} ({load_err}). Falling back to CPU...")
-                    self.device = "cpu"
-                    self.torch_dtype = torch.float32
+                try:
                     self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                         self.model_id,
                         torch_dtype=self.torch_dtype,
-                    ).to("cpu")
+                    ).to(self.device)
                     self.model.eval()
-                else:
-                    raise load_err
+                except Exception as load_err:
+                    if self.device != "cpu":
+                        logger.warning(f"Could not load onto {self.device} ({load_err}). Falling back to CPU...")
+                        self.device = "cpu"
+                        self.torch_dtype = torch.float32
+                        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                            self.model_id,
+                            torch_dtype=self.torch_dtype,
+                        ).to("cpu")
+                        self.model.eval()
+                    else:
+                        raise load_err
 
-            self.processor = AutoProcessor.from_pretrained(
-                self.model_id,
-                min_pixels=self.min_pixels,
-                max_pixels=self.max_pixels,
-            )
+                self.processor = AutoProcessor.from_pretrained(
+                    self.model_id,
+                    min_pixels=self.min_pixels,
+                    max_pixels=self.max_pixels,
+                )
 
-            self.load_time_seconds = time.perf_counter() - start_time
-            self.is_loaded = True
-            logger.info(f"Qwen2.5-VL loaded successfully in {self.load_time_seconds:.2f}s")
-        finally:
-            self._is_loading = False
+                self.load_time_seconds = time.perf_counter() - start_time
+                self.is_loaded = True
+                logger.info(f"Qwen2.5-VL loaded successfully in {self.load_time_seconds:.2f}s")
+            finally:
+                self._is_loading = False
 
     def unload_model(self) -> None:
         """Release model weights and clear accelerator cache."""
@@ -209,78 +213,85 @@ class QwenVLMService:
         """Run end-to-end inference with structured error handling and latency tracking."""
         start_time = time.perf_counter()
 
-        try:
-            self.load_model()
+        with self._lock:
+            try:
+                self.load_model()
 
-            messages, loaded_images = self._prepare_inputs(
-                question=request.question,
-                pre_image_path=request.pre_image_path,
-                post_image_path=request.post_image_path,
-                image_path=request.image_path,
-                image_paths=request.image_paths,
-            )
-
-            prompt_text = self.processor.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,
-            )
-
-            processor_kwargs: Dict[str, Any] = {
-                "text": [prompt_text],
-                "padding": True,
-                "return_tensors": "pt",
-            }
-            if loaded_images:
-                processor_kwargs["images"] = loaded_images
-
-            inputs = self.processor(**processor_kwargs)
-            inputs = {
-                k: v.to(self.device, dtype=self.torch_dtype)
-                if (hasattr(v, "to") and torch.is_floating_point(v))
-                else (v.to(self.device) if hasattr(v, "to") else v)
-                for k, v in inputs.items()
-            }
-
-            with torch.inference_mode():
-                generated_ids = self.model.generate(
-                    **inputs,
-                    max_new_tokens=request.max_new_tokens,
-                    do_sample=(request.temperature > 0.0),
-                    temperature=(request.temperature if request.temperature > 0.0 else None),
-                    use_cache=True,
+                messages, loaded_images = self._prepare_inputs(
+                    question=request.question,
+                    pre_image_path=request.pre_image_path,
+                    post_image_path=request.post_image_path,
+                    image_path=request.image_path,
+                    image_paths=request.image_paths,
                 )
 
-            # Strip input tokens from generation
-            input_length = inputs["input_ids"].shape[1]
-            generated_ids = generated_ids[:, input_length:]
+                prompt_text = self.processor.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
 
-            decoded = self.processor.batch_decode(
-                generated_ids,
-                skip_special_tokens=True,
-            )
-            prediction = decoded[0].strip()
-            latency_ms = (time.perf_counter() - start_time) * 1000.0
+                processor_kwargs: Dict[str, Any] = {
+                    "text": [prompt_text],
+                    "padding": True,
+                    "return_tensors": "pt",
+                }
+                if loaded_images:
+                    processor_kwargs["images"] = loaded_images
 
-            return VLMInferenceResponse(
-                prediction=prediction,
-                latency_ms=latency_ms,
-                device=self.device,
-                model_id=self.model_id,
-                status="SUCCESS",
-            )
+                inputs = self.processor(**processor_kwargs)
+                inputs = {
+                    k: v.to(self.device, dtype=self.torch_dtype)
+                    if (hasattr(v, "to") and torch.is_floating_point(v))
+                    else (v.to(self.device) if hasattr(v, "to") else v)
+                    for k, v in inputs.items()
+                }
 
-        except Exception as exc:
-            latency_ms = (time.perf_counter() - start_time) * 1000.0
-            logger.error(f"VLM inference failed: {exc}", exc_info=True)
-            return VLMInferenceResponse(
-                prediction="",
-                latency_ms=latency_ms,
-                device=self.device,
-                model_id=self.model_id,
-                status="ERROR",
-                error_message=str(exc),
-            )
+                if self.device == "mps" and hasattr(torch, "mps"):
+                    torch.mps.synchronize()
+
+                with torch.inference_mode():
+                    generated_ids = self.model.generate(
+                        **inputs,
+                        max_new_tokens=request.max_new_tokens,
+                        do_sample=(request.temperature > 0.0),
+                        temperature=(request.temperature if request.temperature > 0.0 else None),
+                        use_cache=True,
+                    )
+
+                if self.device == "mps" and hasattr(torch, "mps"):
+                    torch.mps.synchronize()
+
+                # Strip input tokens from generation
+                input_length = inputs["input_ids"].shape[1]
+                generated_ids = generated_ids[:, input_length:]
+
+                decoded = self.processor.batch_decode(
+                    generated_ids,
+                    skip_special_tokens=True,
+                )
+                prediction = decoded[0].strip()
+                latency_ms = (time.perf_counter() - start_time) * 1000.0
+
+                return VLMInferenceResponse(
+                    prediction=prediction,
+                    latency_ms=latency_ms,
+                    device=self.device,
+                    model_id=self.model_id,
+                    status="SUCCESS",
+                )
+
+            except Exception as exc:
+                latency_ms = (time.perf_counter() - start_time) * 1000.0
+                logger.error(f"VLM inference failed: {exc}", exc_info=True)
+                return VLMInferenceResponse(
+                    prediction="",
+                    latency_ms=latency_ms,
+                    device=self.device,
+                    model_id=self.model_id,
+                    status="ERROR",
+                    error_message=str(exc),
+                )
 
 
 # Global singleton instance for reuse across requests

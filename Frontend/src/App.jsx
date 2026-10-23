@@ -1,788 +1,1801 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {
+  Send,
+  Paperclip,
+  Image as ImageIcon,
+  Plus,
+  Trash2,
+  Copy,
+  Check,
+  ExternalLink,
+  ChevronDown,
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeft,
+  Sparkles,
+  ShieldAlert,
+  Globe,
+  Cpu,
+  X,
+  Maximize2,
+  RefreshCw,
+  MessageSquare,
+  AlertTriangle,
+  Flame,
+  Waves,
+  Building2,
+  Wind,
+  Square
+} from 'lucide-react';
+
+const STORAGE_KEY = 'disastermind_chat_sessions_v1';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('intelligence');
-  const [healthStatus, setHealthStatus] = useState({ online: false, points: 0 });
-  const [stats, setStats] = useState(null);
-  const [engineMode, setEngineMode] = useState('deep_vlm'); // 'deep_vlm' for neural reasoning on MPS, 'fast' for instant CLIP zero-shot (<30ms)
-  const [vlmStatus, setVlmStatus] = useState({ ready: false, is_loading: false, device: 'mps' });
+  // Responsive mobile state
+  const [isMobile, setIsMobile] = useState(() => {
+    return typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  });
 
-  // Intelligence State (Multiple User Uploads + Live Internet Evidence)
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [previewItems, setPreviewItems] = useState([]);
-  const [intelQuestion, setIntelQuestion] = useState('What disaster is happening here, where did it occur, what caused it, and what is the damage?');
+  // Sidebar & System state
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    return typeof window !== 'undefined' ? window.innerWidth >= 768 : true;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const engineMode = 'deep_vlm';
   const [searchLiveWeb, setSearchLiveWeb] = useState(true);
-  const [intelLoading, setIntelLoading] = useState(false);
-  const [intelResult, setIntelResult] = useState(null);
-  const [intelError, setIntelError] = useState(null);
+  const [systemStatus, setSystemStatus] = useState({ online: true, points: 1263, vlmReady: true });
+  const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
+
+  // Chat Sessions
+  const [sessions, setSessions] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Failed to parse saved sessions:', e);
+    }
+    return [
+      {
+        id: 'session-' + Date.now(),
+        title: 'New Disaster Assessment',
+        createdAt: new Date().toISOString(),
+        image_paths: [],
+        messages: [],
+      },
+    ];
+  });
+
+  const [activeSessionId, setActiveSessionId] = useState(() => {
+    return sessions[0]?.id || 'session-1';
+  });
+
+  // Current session lookup
+  const activeSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
+
+  // Input & attachments state
+  const [inputText, setInputText] = useState('');
+  const [attachedFiles, setAttachedFiles] = useState([]);
+  const [attachedPreviews, setAttachedPreviews] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+
+  // Refs
   const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const chatScrollContainerRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
-  // RAG query state
-  const [ragQuestion, setRagQuestion] = useState('How many buildings collapsed after the earthquake in Antakya?');
-  const [taskType, setTaskType] = useState('Building Damage Counting');
-  const [ragLoading, setRagLoading] = useState(false);
-  const [ragResult, setRagResult] = useState(null);
-  const [ragError, setRagError] = useState(null);
+  // Save sessions to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    } catch (e) {
+      console.warn('LocalStorage save failed:', e);
+    }
+  }, [sessions]);
 
-  // Live feed state
-  const [liveItems, setLiveItems] = useState([]);
-  const [fetchingFeed, setFetchingFeed] = useState(false);
-
-  // Check health and VLM status on load
+  // Check health and VLM status on mount
   useEffect(() => {
     fetch('/health')
-      .then(res => res.json())
-      .then(data => {
-        setHealthStatus({ online: data.status === 'HEALTHY', points: data.qdrant_points || 1263 });
+      .then((r) => r.json())
+      .then((d) => {
+        setSystemStatus((prev) => ({
+          ...prev,
+          online: d.status === 'HEALTHY',
+          points: d.qdrant_points || 1263,
+        }));
       })
-      .catch(() => {
-        setHealthStatus({ online: true, points: 1263 });
-      });
-
-    fetch('/api/v1/vlm/status')
-      .then(res => res.json())
-      .then(data => setVlmStatus(data))
       .catch(() => {});
 
-    fetch('/api/v1/dataset/stats')
-      .then(res => res.json())
-      .then(data => setStats(data))
+    fetch('/api/v1/vlm/status')
+      .then((r) => r.json())
+      .then((d) => {
+        setSystemStatus((prev) => ({
+          ...prev,
+          vlmReady: d.ready ?? true,
+          device: d.device || 'mps',
+        }));
+      })
       .catch(() => {});
   }, []);
 
-  // Handle Multiple Image File Selection
+  // Auto-scroll to bottom of chat when new messages appear
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [activeSession?.messages, isSending]);
+
+  // Adjust textarea height dynamically
+  const handleTextareaInput = (e) => {
+    setInputText(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 160) + 'px';
+    }
+  };
+
+  // Create New Chat
+  const handleNewChat = () => {
+    const newSession = {
+      id: 'session-' + Date.now(),
+      title: 'New Assessment',
+      createdAt: new Date().toISOString(),
+      image_paths: [],
+      messages: [],
+    };
+    setSessions((prev) => [newSession, ...prev]);
+    setActiveSessionId(newSession.id);
+    clearInput();
+    if (isMobile) setSidebarOpen(false);
+  };
+
+  // Delete Chat Session
+  const handleDeleteSession = (sessionId, e) => {
+    e.stopPropagation();
+    if (sessions.length <= 1) {
+      // Reset current instead of leaving empty
+      const fresh = {
+        id: 'session-' + Date.now(),
+        title: 'New Assessment',
+        createdAt: new Date().toISOString(),
+        image_paths: [],
+        messages: [],
+      };
+      setSessions([fresh]);
+      setActiveSessionId(fresh.id);
+    } else {
+      const remaining = sessions.filter((s) => s.id !== sessionId);
+      setSessions(remaining);
+      if (activeSessionId === sessionId) {
+        setActiveSessionId(remaining[0].id);
+      }
+    }
+  };
+
+  // Clear all sessions
+  const handleClearAllChats = () => {
+    if (window.confirm('Are you sure you want to delete all chat history?')) {
+      const fresh = {
+        id: 'session-' + Date.now(),
+        title: 'New Assessment',
+        createdAt: new Date().toISOString(),
+        image_paths: [],
+        messages: [],
+      };
+      setSessions([fresh]);
+      setActiveSessionId(fresh.id);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  };
+
+  // Attach images
   const handleFileChange = (e) => {
-    const selected = Array.from(e.target.files || []);
-    if (selected.length > 0) {
-      setUploadedFiles(prev => [...prev, ...selected]);
-      const newPreviews = selected.map(f => ({
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setAttachedFiles((prev) => [...prev, ...files]);
+      const previews = files.map((f) => ({
         name: f.name,
         size: (f.size / (1024 * 1024)).toFixed(2) + ' MB',
         url: URL.createObjectURL(f),
       }));
-      setPreviewItems(prev => [...prev, ...newPreviews]);
-      setIntelResult(null);
+      setAttachedPreviews((prev) => [...prev, ...previews]);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleRemoveFile = (index) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-    setPreviewItems(prev => {
+  const handleRemoveAttached = (index) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
+    setAttachedPreviews((prev) => {
       URL.revokeObjectURL(prev[index]?.url);
       return prev.filter((_, i) => i !== index);
     });
   };
 
-  const handleClearImages = () => {
-    previewItems.forEach(item => URL.revokeObjectURL(item.url));
-    setUploadedFiles([]);
-    setPreviewItems([]);
+  const clearInput = () => {
+    setInputText('');
+    attachedPreviews.forEach((p) => URL.revokeObjectURL(p.url));
+    setAttachedFiles([]);
+    setAttachedPreviews([]);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Run Image & Incident Intelligence Analysis (Multi-Image Enabled)
-  const handleAnalyzeIntelligence = async () => {
-    setIntelLoading(true);
-    setIntelResult(null);
-    setIntelError(null);
-
-    const formData = new FormData();
-    formData.append('question', intelQuestion);
-    formData.append('search_live', searchLiveWeb);
-    formData.append('engine_mode', engineMode);
-    
-    // Append all selected images
-    uploadedFiles.forEach(file => {
-      formData.append('images', file);
-    });
-    if (uploadedFiles[0]) {
-      formData.append('image', uploadedFiles[0]);
+  // Stop / Cancel ongoing generation
+  const handleCancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
     }
+    setIsSending(false);
+  };
+
+  // Drag and drop images into chat
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const imageFiles = Array.from(e.dataTransfer.files).filter((f) =>
+        f.type.startsWith('image/')
+      );
+      if (imageFiles.length > 0) {
+        setAttachedFiles((prev) => [...prev, ...imageFiles]);
+        const previews = imageFiles.map((f) => ({
+          name: f.name,
+          size: (f.size / (1024 * 1024)).toFixed(2) + ' MB',
+          url: URL.createObjectURL(f),
+        }));
+        setAttachedPreviews((prev) => [...prev, ...previews]);
+      }
+    }
+  };
+
+  // Copy response
+  const handleCopy = (id, text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // Send Message
+  const handleSendMessage = async (customPrompt) => {
+    const questionText = (customPrompt || inputText).trim();
+    if (!questionText && attachedFiles.length === 0) return;
+
+    const userMessageId = 'msg-' + Date.now();
+    const assistantMessageId = 'msg-' + (Date.now() + 1);
+
+    // Save attached images preview for this user message
+    const messageImages = attachedPreviews.map((p) => ({
+      name: p.name,
+      url: p.url,
+    }));
+
+    const newUserMessage = {
+      id: userMessageId,
+      role: 'user',
+      text: questionText || 'Analyze the uploaded disaster imagery.',
+      images: messageImages,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    // Update active session with user message and placeholder title
+    setSessions((prevSessions) =>
+      prevSessions.map((session) => {
+        if (session.id === activeSession.id) {
+          const updatedMessages = [...session.messages, newUserMessage];
+          const newTitle =
+            session.messages.length === 0
+              ? questionText.slice(0, 38) || 'Disaster Imagery Analysis'
+              : session.title;
+          return {
+            ...session,
+            title: newTitle,
+            messages: updatedMessages,
+          };
+        }
+        return session;
+      })
+    );
+
+    // Clear input box
+    const filesToSend = [...attachedFiles];
+    setInputText('');
+    setAttachedFiles([]);
+    setAttachedPreviews([]);
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    setIsSending(true);
 
     try {
+      const formData = new FormData();
+      formData.append('question', questionText || 'Analyze the uploaded disaster imagery.');
+      formData.append('search_live', searchLiveWeb);
+      formData.append('engine_mode', engineMode);
+
+      // Multi-turn conversation context: Send recent turns so model reasons based on above conversation
+      const priorHistory = activeSession.messages
+        .slice(-6)
+        .map((m) => {
+          if (m.role === 'user') return `User: ${m.text}`;
+          const b = m.responseData?.breakdown;
+          const ans = b ? `${b.what_happened} ${b.impact_and_severity}` : m.text;
+          return `DisasterMind: ${ans}`;
+        })
+        .join('\n');
+
+      if (priorHistory) {
+        formData.append('conversation_history', priorHistory);
+      }
+
+      // If user uploaded new files in this turn
+      if (filesToSend.length > 0) {
+        filesToSend.forEach((file) => {
+          formData.append('images', file);
+        });
+        formData.append('image', filesToSend[0]);
+      } else if (activeSession.image_paths && activeSession.image_paths.length > 0) {
+        // Reuse existing image paths from this conversation
+        formData.append('existing_image_paths', JSON.stringify(activeSession.image_paths));
+      }
+
       const res = await fetch('/api/v1/intelligence/analyze-upload', {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setIntelResult(data);
-      } else {
-        const err = await res.json().catch(() => ({}));
-        setIntelError(err.detail || `Server error (${res.status}): Failed to execute real vision assessment.`);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Server returned error (${res.status})`);
       }
+
+      const data = await res.json();
+
+      const newAssistantMessage = {
+        id: assistantMessageId,
+        role: 'assistant',
+        text: data.summary,
+        responseData: data,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      // Update session with assistant response and store image paths for follow-up turns
+      setSessions((prevSessions) =>
+        prevSessions.map((session) => {
+          if (session.id === activeSession.id) {
+            const combinedPaths = Array.from(
+              new Set([...(session.image_paths || []), ...(data.image_paths || [])])
+            );
+            return {
+              ...session,
+              image_paths: combinedPaths,
+              messages: [...session.messages, newAssistantMessage],
+            };
+          }
+          return session;
+        })
+      );
     } catch (err) {
-      setIntelError(`Connection failed: Unable to reach backend server at http://localhost:8000. ${err.message}`);
+      if (err.name === 'AbortError' || controller.signal.aborted) {
+        const cancelledMessage = {
+          id: assistantMessageId,
+          role: 'assistant',
+          isCancelled: true,
+          text: 'Assessment stopped by user.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+
+        setSessions((prevSessions) =>
+          prevSessions.map((session) => {
+            if (session.id === activeSession.id) {
+              return {
+                ...session,
+                messages: [...session.messages, cancelledMessage],
+              };
+            }
+            return session;
+          })
+        );
+        return;
+      }
+
+      const errorMessage = {
+        id: assistantMessageId,
+        role: 'assistant',
+        isError: true,
+        text: `Analysis failed: ${err.message}. Please check that the DisasterMind backend server is running.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      setSessions((prevSessions) =>
+        prevSessions.map((session) => {
+          if (session.id === activeSession.id) {
+            return {
+              ...session,
+              messages: [...session.messages, errorMessage],
+            };
+          }
+          return session;
+        })
+      );
     } finally {
-      setIntelLoading(false);
+      setIsSending(false);
+      abortControllerRef.current = null;
     }
   };
 
-  // Run Classic RAG
-  const handleRunRAG = async () => {
-    setRagLoading(true);
-    setRagResult(null);
-    setRagError(null);
-
-    try {
-      const res = await fetch('/api/v1/rag/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: ragQuestion,
-          task_type: taskType,
-          fusion_top_k: 3,
-          text_top_k: 5,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setRagResult(data);
-      } else {
-        const err = await res.json().catch(() => ({}));
-        setRagError(err.detail || `Server returned status ${res.status}`);
+  // Keyboard shortcut: Enter sends message (Shift+Enter inserts newline), Escape cancels
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && isSending) {
+      e.preventDefault();
+      handleCancelGeneration();
+      return;
+    }
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!isSending) {
+        handleSendMessage();
       }
-    } catch (err) {
-      setRagError(`Connection error: ${err.message}`);
-    } finally {
-      setRagLoading(false);
     }
   };
 
-  const handleFetchLiveFeeds = async () => {
-    setFetchingFeed(true);
-    try {
-      const res = await fetch('/api/v1/live/ingest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feed_source: 'usgs', limit: 6, auto_index: false }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setLiveItems(data.items || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch live feeds:', err);
-    } finally {
-      setFetchingFeed(false);
-    }
-  };
+  // Starter Prompts
+  const starterPrompts = [
+    {
+      title: 'Assess Building Damage',
+      desc: 'Evaluate collapsed concrete elements, shear cracks, and rubble stability',
+      icon: <Building2 size={20} className="text-amber-400" />,
+      query: 'Examine this disaster scene: What is the extent of structural damage, collapsed elements, and occupant entrapment risk?',
+    },
+    {
+      title: 'Flood Inundation & Rescue',
+      desc: 'Measure submerged depth, road cutoffs, and utility vulnerability',
+      icon: <Waves size={20} className="text-cyan-400" />,
+      query: 'Assess this flood scene: What is the estimated water depth, submerged road status, and immediate evacuation priorities?',
+    },
+    {
+      title: 'Wildfire Spread & Hazards',
+      desc: 'Analyze active flame front, smoke direction, and perimeter risk',
+      icon: <Flame size={20} className="text-rose-400" />,
+      query: 'Analyze this wildfire imagery: What is the smoke plume density, flame propagation risk, and containment urgency?',
+    },
+    {
+      title: 'Storm & Hurricane Debris',
+      desc: 'Analyze roof peeling, downed power lines, and tree blockages',
+      icon: <Wind size={20} className="text-sky-400" />,
+      query: 'What cyclonic storm or hurricane damage has occurred here? List damaged infrastructure and road blockages.',
+    },
+  ];
 
   return (
-    <div style={{ maxWidth: '1320px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-      {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-            <span style={{ fontSize: '2.2rem' }}>🛰️</span>
-            <h1 style={{ fontSize: '1.85rem', fontWeight: 700, letterSpacing: '-0.02em', background: 'linear-gradient(to right, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              DisasterMind
-            </h1>
-            <span className="badge badge-info">Multimodal Intelligence</span>
+    <div className="chat-container" onDragOver={handleDragOver} onDrop={handleDrop}>
+      {/* Mobile backdrop */}
+      {isMobile && sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* ============================================================ */}
+      {/* SIDEBAR (ChatGPT Style)                                      */}
+      {/* ============================================================ */}
+      <aside className={`chat-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
+        <div style={{ padding: '0.85rem 0.85rem 0.5rem 0.85rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+          {/* Top Brand & Collapse */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.2rem 0.35rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <img
+                src="/logo-icon.png"
+                alt="DisasterMind Icon"
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 2px 6px rgba(0, 114, 194, 0.4))',
+                }}
+              />
+              <img
+                src="/logo-white.png"
+                alt="DisasterMind Logo"
+                style={{
+                  height: '22px',
+                  width: 'auto',
+                  objectFit: 'contain',
+                }}
+              />
+            </div>
+
+            <button
+              onClick={() => setSidebarOpen(false)}
+              title="Close sidebar"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            >
+              <PanelLeftClose size={18} />
+            </button>
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Upload any disaster imagery + ask questions to discover <strong>What</strong>, <strong>Where</strong>, <strong>How</strong>, and <strong>Live Internet Evidence</strong>
-          </p>
+
+          {/* New Chat Button */}
+          <button
+            onClick={handleNewChat}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-light)',
+              borderRadius: '10px',
+              padding: '0.65rem 0.85rem',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-sky)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-light)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+              <Plus size={16} />
+              <span>New chat</span>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', border: '1px solid var(--border-light)', padding: '1px 5px', borderRadius: '4px' }}>
+              Ctrl+K
+            </span>
+          </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ fontSize: '0.85rem' }}>{vlmStatus.ready ? '🟢' : '⚡'}</span>
-            <div style={{ fontSize: '0.78rem' }}>
-              <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                {vlmStatus.ready ? `VLM Ready (${vlmStatus.device?.toUpperCase()})` : 'Instant Engine Active'}
-              </div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                {vlmStatus.ready ? 'Qwen2.5-VL 3B' : 'CLIP & Live Telemetry'}
-              </div>
-            </div>
+        {/* Sessions History List */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem 0.65rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', padding: '0.4rem 0.5rem', fontWeight: 600 }}>
+            Recent Conversations
           </div>
-          <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span className="live-indicator" />
-            <div style={{ fontSize: '0.78rem' }}>
-              <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>System Live</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>{healthStatus.points} Qdrant vectors</div>
-            </div>
-          </div>
-        </div>
-      </header>
 
-      {/* Navigation Tabs */}
-      <nav style={{ display: 'flex', gap: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.85rem', marginBottom: '2rem' }}>
-        <button
-          className="btn-secondary"
-          style={{
-            background: activeTab === 'intelligence' ? 'rgba(56, 189, 248, 0.2)' : '',
-            borderColor: activeTab === 'intelligence' ? 'var(--accent-blue)' : '',
-            color: activeTab === 'intelligence' ? '#38bdf8' : '',
-            fontWeight: 600,
-          }}
-          onClick={() => setActiveTab('intelligence')}
-        >
-          📷 Live Image & Incident Intelligence
-        </button>
-        <button
-          className="btn-secondary"
-          style={{
-            background: activeTab === 'rag' ? 'rgba(56, 189, 248, 0.2)' : '',
-            borderColor: activeTab === 'rag' ? 'var(--accent-blue)' : '',
-            color: activeTab === 'rag' ? '#38bdf8' : '',
-          }}
-          onClick={() => setActiveTab('rag')}
-        >
-          🔍 Corpus RAG Pipeline
-        </button>
-        <button
-          className="btn-secondary"
-          style={{
-            background: activeTab === 'live' ? 'rgba(56, 189, 248, 0.2)' : '',
-            borderColor: activeTab === 'live' ? 'var(--accent-blue)' : '',
-            color: activeTab === 'live' ? '#38bdf8' : '',
-          }}
-          onClick={() => { setActiveTab('live'); handleFetchLiveFeeds(); }}
-        >
-          ⚡ Live USGS & Global Feeds
-        </button>
-        <button
-          className="btn-secondary"
-          style={{
-            background: activeTab === 'stats' ? 'rgba(56, 189, 248, 0.2)' : '',
-            borderColor: activeTab === 'stats' ? 'var(--accent-blue)' : '',
-            color: activeTab === 'stats' ? '#38bdf8' : '',
-          }}
-          onClick={() => setActiveTab('stats')}
-        >
-          📊 Dataset & Benchmarks
-        </button>
-      </nav>
-
-      {/* TAB 1: LIVE IMAGE & INCIDENT INTELLIGENCE (MAIN USER REQUEST) */}
-      {activeTab === 'intelligence' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1.35fr', gap: '1.75rem' }}>
-          {/* Upload & Input Panel */}
-          <div className="glass-panel" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--accent-blue)', margin: 0 }}>
-                  1. Upload Disaster Scene Imagery ({uploadedFiles.length})
-                </h2>
-                {uploadedFiles.length > 0 && (
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem', color: '#f43f5e' }}
-                    onClick={handleClearImages}
+          {sessions.map((session) => {
+            const isActive = session.id === activeSession.id;
+            return (
+              <div
+                key={session.id}
+                onClick={() => {
+                  setActiveSessionId(session.id);
+                  clearInput();
+                  if (isMobile) setSidebarOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.55rem 0.75rem',
+                  borderRadius: '8px',
+                  backgroundColor: isActive ? 'var(--bg-session-active)' : 'transparent',
+                  border: isActive ? '1px solid var(--border-sky)' : '1px solid transparent',
+                  color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  transition: 'all 0.15s ease',
+                  group: 'session-row',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', overflow: 'hidden' }}>
+                  <MessageSquare size={14} style={{ flexShrink: 0, opacity: isActive ? 1 : 0.6 }} />
+                  <span
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      fontWeight: isActive ? 500 : 400,
+                    }}
                   >
-                    ✕ Clear All
-                  </button>
-                )}
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
-                Upload multiple satellite images, pre/post disaster pairs, drone captures, or street-level photos.
-              </p>
-            </div>
+                    {session.title || 'New Assessment'}
+                  </span>
+                </div>
 
-            {/* Drag & Drop Multi-Image Upload Box */}
+                <button
+                  onClick={(e) => handleDeleteSession(session.id, e)}
+                  title="Delete chat"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    opacity: isActive ? 0.7 : 0.3,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.color = '#f87171';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = isActive ? '0.7' : '0.3';
+                    e.currentTarget.style.color = 'var(--text-muted)';
+                  }}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Sidebar Controls Footer */}
+        <div
+          style={{
+            padding: '0.85rem',
+            borderTop: '1px solid var(--border-light)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+            backgroundColor: '#141414',
+          }}
+        >
+          {/* Reasoning Engine Indicator */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.45rem 0.55rem',
+              borderRadius: '8px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.75rem' }}>
+              <Cpu size={13} color="var(--accent-sky)" />
+              <span style={{ color: 'var(--text-secondary)' }}>Reasoning Engine</span>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--accent-sky)', fontWeight: 600 }}>
+              Deep Neural
+            </span>
+          </div>
+
+          {/* Live Web Telemetry Toggle */}
+          <div
+            onClick={() => setSearchLiveWeb((prev) => !prev)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.45rem 0.55rem',
+              borderRadius: '8px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.75rem' }}>
+              <Globe size={13} color={searchLiveWeb ? 'var(--accent-sky)' : 'var(--text-muted)'} />
+              <span style={{ color: searchLiveWeb ? '#ececec' : 'var(--text-muted)' }}>USGS Live Telemetry</span>
+            </div>
             <div
               style={{
-                border: '2px dashed var(--border-color)',
-                borderRadius: '12px',
-                padding: '1.25rem',
-                textAlign: 'center',
-                background: 'rgba(0, 0, 0, 0.25)',
-                cursor: 'pointer',
+                width: '28px',
+                height: '16px',
+                borderRadius: '9999px',
+                backgroundColor: searchLiveWeb ? 'var(--accent-sky)' : '#334155',
                 position: 'relative',
-                transition: 'all 0.2s ease',
-              }}
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                  handleFileChange({ target: { files: e.dataTransfer.files } });
-                }
+                transition: 'background-color 0.2s ease',
               }}
             >
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  position: 'absolute',
+                  top: '2px',
+                  left: searchLiveWeb ? '14px' : '2px',
+                  transition: 'left 0.2s ease',
+                }}
               />
+            </div>
+          </div>
 
-              <div style={{ padding: '0.5rem 0' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.35rem' }}>📥</div>
-                <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.92rem', marginBottom: '0.25rem' }}>
-                  Click to select or drag & drop multiple disaster images
-                </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-                  Select multiple files at once • PNG, JPG, JPEG, WebP, GeoTIFF
-                </div>
-              </div>
+          {/* System Online Badge & Clear history */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+              <span className="online-dot" />
+              <span>Indexed: {systemStatus.points} pts</span>
             </div>
 
-            {/* Multi-Image Preview Gallery Grid */}
-            {previewItems.length > 0 && (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
-                gap: '0.75rem',
-                maxHeight: '260px',
-                overflowY: 'auto',
-                padding: '0.5rem',
-                background: 'rgba(0,0,0,0.3)',
+            <button
+              onClick={handleClearAllChats}
+              title="Clear all chat history"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: '0.72rem',
+                textDecoration: 'underline',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#f87171')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            >
+              Clear all
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* ============================================================ */}
+      {/* MAIN CHAT VIEWPORT                                           */}
+      {/* ============================================================ */}
+      <main className="chat-main">
+        {/* Top Header Bar */}
+        <header
+          className="chat-header"
+          style={{
+            height: '52px',
+            borderBottom: '1px solid var(--border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 1rem',
+            backgroundColor: 'var(--bg-header)',
+            backdropFilter: 'blur(12px)',
+            zIndex: 20,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {(!sidebarOpen || isMobile) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <button
+                  onClick={() => setSidebarOpen((prev) => !prev)}
+                  title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    padding: '6px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  <PanelLeft size={19} />
+                </button>
+                <img
+                  src="/logo-icon.png"
+                  alt="DisasterMind Logo"
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 6px rgba(0, 114, 194, 0.4))',
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Model Badge */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.25rem 0.65rem',
                 borderRadius: '8px',
-                border: '1px solid var(--border-color)'
-              }}>
-                {previewItems.map((item, idx) => (
+                backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                border: '1px solid var(--border-light)',
+                fontSize: '0.85rem',
+                fontWeight: 500,
+                color: '#f0f6fc',
+              }}
+            >
+              <img
+                src="/logo-icon.png"
+                alt="DisasterMind"
+                style={{ width: '15px', height: '15px', objectFit: 'contain' }}
+              />
+              <span>DisasterMind 3B</span>
+              <span className="hide-on-mobile" style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                · Deep Neural VLM
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {activeSession?.image_paths?.length > 0 && (
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '9999px',
+                  backgroundColor: 'rgba(16, 163, 127, 0.15)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16, 163, 127, 0.3)',
+                }}
+              >
+                📸 Image Context Active ({activeSession.image_paths.length})
+              </span>
+            )}
+
+            <button
+              onClick={handleNewChat}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-light)',
+                borderRadius: '8px',
+                color: 'var(--text-secondary)',
+                padding: '0.35rem 0.65rem',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-hover)';
+                e.currentTarget.style.color = '#fff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+            >
+              <Plus size={14} />
+              <span>New</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Scrollable Messages Thread */}
+        <div className="messages-container" ref={chatScrollContainerRef}>
+          {activeSession.messages.length === 0 ? (
+            /* Empty State / Welcome Screen */
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '2rem 1.5rem 10rem 1.5rem',
+                maxWidth: '780px',
+                margin: '0 auto',
+                width: '100%',
+                textAlign: 'center',
+              }}
+            >
+              <img
+                src="/logo-white.png"
+                alt="DisasterMind: AI For A Safer Tomorrow"
+                className="hero-logo"
+                style={{
+                  height: '68px',
+                  width: 'auto',
+                  maxWidth: '320px',
+                  objectFit: 'contain',
+                  marginBottom: '1.25rem',
+                  filter: 'drop-shadow(0 6px 20px rgba(0, 114, 194, 0.25))',
+                }}
+              />
+
+              <h1
+                className="hero-title"
+                style={{
+                  fontSize: '1.85rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  marginBottom: '0.5rem',
+                  letterSpacing: '-0.03em',
+                }}
+              >
+                How can I assist your disaster assessment?
+              </h1>
+              <p
+                className="hero-desc"
+                style={{
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.95rem',
+                  maxWidth: '540px',
+                  lineHeight: 1.6,
+                  marginBottom: '2.5rem',
+                }}
+              >
+                Upload any disaster photo, aerial capture, or question. DisasterMind assesses structural integrity,
+                identifies damage causes, links live USGS feeds, and remembers context across follow-ups.
+              </p>
+
+              {/* Starter Quick Actions Grid */}
+              <div
+                className="starter-card-grid"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: '0.75rem',
+                  width: '100%',
+                }}
+              >
+                {starterPrompts.map((starter, i) => (
+                  <div
+                    key={i}
+                    className="starter-card"
+                    onClick={() => handleSendMessage(starter.query)}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                      {starter.icon}
+                      <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#f3f4f6' }}>
+                        {starter.title}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                      {starter.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Active Messages List */
+            <div className="messages-inner">
+              {activeSession.messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className="animate-fade-in"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem',
+                    alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                    width: '100%',
+                  }}
+                >
+                  {/* USER MESSAGE */}
+                  {msg.role === 'user' ? (
+                    <div
+                      style={{
+                        maxWidth: '85%',
+                        backgroundColor: 'var(--bg-user-bubble)',
+                        border: '1px solid var(--border-light)',
+                        borderRadius: '20px 20px 4px 20px',
+                        padding: '0.85rem 1.15rem',
+                        color: 'var(--text-main)',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                      }}
+                    >
+                      {/* Uploaded image previews */}
+                      {msg.images && msg.images.length > 0 && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '0.5rem',
+                            marginBottom: '0.65rem',
+                          }}
+                        >
+                          {msg.images.map((img, idx) => (
+                            <div
+                              key={idx}
+                              style={{
+                                position: 'relative',
+                                borderRadius: '10px',
+                                overflow: 'hidden',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => setSelectedPreviewImage(img.url)}
+                            >
+                              <img
+                                src={img.url}
+                                alt={img.name}
+                                style={{
+                                  width: '140px',
+                                  height: '100px',
+                                  objectFit: 'cover',
+                                  display: 'block',
+                                }}
+                              />
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  padding: '2px 6px',
+                                  fontSize: '0.65rem',
+                                  backgroundColor: 'rgba(0,0,0,0.65)',
+                                  color: '#fff',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                {img.name}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <p style={{ fontSize: '0.95rem', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
+                        {msg.text}
+                      </p>
+                      <div
+                        style={{
+                          fontSize: '0.7rem',
+                          color: 'var(--text-muted)',
+                          textAlign: 'right',
+                          marginTop: '0.35rem',
+                        }}
+                      >
+                        {msg.timestamp}
+                      </div>
+                    </div>
+                  ) : (
+                    /* ASSISTANT MESSAGE */
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '1rem',
+                        width: '100%',
+                        padding: '0.5rem 0',
+                      }}
+                    >
+                      {/* Avatar */}
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          boxShadow: '0 2px 8px rgba(0, 114, 194, 0.2)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <img
+                          src="/logo-icon.png"
+                          alt="DisasterMind AI"
+                          style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                        />
+                      </div>
+
+                      {/* Content Box */}
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                        {msg.isCancelled ? (
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
+                              borderRadius: '8px',
+                              padding: '0.6rem 0.9rem',
+                              color: 'var(--text-muted)',
+                              fontSize: '0.86rem',
+                              width: 'fit-content',
+                            }}
+                          >
+                            <Square size={13} fill="currentColor" color="#ef4444" />
+                            <span>Assessment stopped by user.</span>
+                          </div>
+                        ) : msg.isError ? (
+                          <div
+                            style={{
+                              backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                              border: '1px solid rgba(244, 63, 94, 0.3)',
+                              borderRadius: '12px',
+                              padding: '1rem',
+                              color: '#fb7185',
+                              fontSize: '0.9rem',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', fontWeight: 600 }}>
+                              <AlertTriangle size={16} />
+                              <span>Error Executing Analysis</span>
+                            </div>
+                            <p>{msg.text}</p>
+                          </div>
+                        ) : msg.responseData ? (
+                          /* Structured Incident Intelligence Card */
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                            {/* Disaster Header Badge & Latency */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.4rem',
+                                  padding: '0.25rem 0.75rem',
+                                  borderRadius: '9999px',
+                                  backgroundColor: 'rgba(16, 163, 127, 0.18)',
+                                  color: '#34d399',
+                                  border: '1px solid rgba(16, 163, 127, 0.35)',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.04em',
+                                }}
+                              >
+                                <ShieldAlert size={14} />
+                                {msg.responseData.breakdown?.detected_disaster_type || 'DISASTER INCIDENT'}
+                                <span>·</span>
+                                {Math.round((msg.responseData.breakdown?.confidence || 0.88) * 100)}% Confidence
+                              </span>
+
+                              {msg.responseData.latency_ms > 0 && (
+                                <span
+                                  style={{
+                                    fontSize: '0.72rem',
+                                    color: 'var(--text-muted)',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    padding: '0.2rem 0.5rem',
+                                    borderRadius: '6px',
+                                  }}
+                                >
+                                  ⚡ {Math.round(msg.responseData.latency_ms)} ms
+                                </span>
+                              )}
+                            </div>
+
+                            {/* 4 Pillars Breakdown Card */}
+                            <div
+                              style={{
+                                backgroundColor: 'var(--bg-card)',
+                                border: '1px solid var(--border-light)',
+                                borderRadius: '14px',
+                                overflow: 'hidden',
+                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+                              }}
+                            >
+                              {/* WHAT */}
+                              <div style={{ padding: '0.9rem 1.15rem', borderBottom: '1px solid var(--border-light)' }}>
+                                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                  What Happened (Observable Damage)
+                                </div>
+                                <div style={{ fontSize: '0.92rem', color: '#f3f4f6', lineHeight: 1.55 }}>
+                                  {msg.responseData.breakdown?.what_happened}
+                                </div>
+                              </div>
+
+                              {/* WHERE & HOW Grid */}
+                              <div
+                                className="pillar-grid"
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                                  borderBottom: '1px solid var(--border-light)',
+                                }}
+                              >
+                                <div className="pillar-border-right" style={{ padding: '0.85rem 1.15rem', borderRight: '1px solid var(--border-light)' }}>
+                                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#fbbf24', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                    Where (Setting & Terrain)
+                                  </div>
+                                  <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                    {msg.responseData.breakdown?.where_it_happened}
+                                  </div>
+                                </div>
+
+                                <div style={{ padding: '0.85rem 1.15rem' }}>
+                                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                    How (Physical Mechanism)
+                                  </div>
+                                  <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                    {msg.responseData.breakdown?.how_it_happened}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* IMPACT & ANSWER */}
+                              <div style={{ padding: '0.95rem 1.15rem', backgroundColor: 'rgba(56, 189, 248, 0.06)' }}>
+                                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                  Impact & Assessment Answer
+                                </div>
+                                <div style={{ fontSize: '0.92rem', color: '#ffffff', lineHeight: 1.55, fontWeight: 450 }}>
+                                  {msg.responseData.breakdown?.impact_and_severity}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Live USGS Evidence Bulletins (If any correlated) */}
+                            {msg.responseData.live_internet_evidence &&
+                              msg.responseData.live_internet_evidence.length > 0 && (
+                                <div
+                                  style={{
+                                    backgroundColor: 'rgba(56, 189, 248, 0.05)',
+                                    border: '1px solid rgba(56, 189, 248, 0.2)',
+                                    borderRadius: '12px',
+                                    padding: '0.85rem 1rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.5rem',
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.78rem', color: '#38bdf8', fontWeight: 600 }}>
+                                    <Globe size={14} />
+                                    <span>Correlated Live Internet Telemetry (USGS)</span>
+                                  </div>
+
+                                  {msg.responseData.live_internet_evidence.map((bulletin, bIdx) => (
+                                    <div
+                                      key={bIdx}
+                                      style={{
+                                        fontSize: '0.82rem',
+                                        color: '#cbd5e1',
+                                        backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                                        borderRadius: '8px',
+                                        padding: '0.65rem 0.85rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '0.25rem',
+                                      }}
+                                    >
+                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <span style={{ fontWeight: 600, color: '#f8fafc' }}>
+                                          {bulletin.title}
+                                        </span>
+                                        {bulletin.source_url && (
+                                          <a
+                                            href={bulletin.source_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.72rem' }}
+                                          >
+                                            View <ExternalLink size={11} />
+                                          </a>
+                                        )}
+                                      </div>
+                                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+                                        {bulletin.snippet}
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                            {/* Source Provenance Tags */}
+                            {msg.responseData.source_provenance && (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.2rem' }}>
+                                {msg.responseData.source_provenance.map((src, sIdx) => (
+                                  <span
+                                    key={sIdx}
+                                    style={{
+                                      fontSize: '0.72rem',
+                                      color: 'var(--text-muted)',
+                                      backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                      border: '1px solid var(--border-light)',
+                                      padding: '0.2rem 0.55rem',
+                                      borderRadius: '6px',
+                                    }}
+                                  >
+                                    ✓ {src.source}: {src.details}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Action Row */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: '0.25rem' }}>
+                              <button
+                                onClick={() => handleCopy(msg.id, msg.responseData.summary || msg.text)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: copiedId === msg.id ? '#10a37f' : 'var(--text-muted)',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  fontSize: '0.75rem',
+                                  padding: '4px 6px',
+                                  borderRadius: '6px',
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = '#ececec')}
+                                onMouseLeave={(e) =>
+                                  (e.currentTarget.style.color =
+                                    copiedId === msg.id ? '#10a37f' : 'var(--text-muted)')
+                                }
+                              >
+                                {copiedId === msg.id ? <Check size={14} /> : <Copy size={14} />}
+                                <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
+                              </button>
+
+                              {/* Follow-up shortcut chips */}
+                              <button
+                                onClick={() =>
+                                  handleSendMessage(
+                                    'Based on this scene, what heavy equipment and rescue teams should be dispatched first?'
+                                  )
+                                }
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid var(--border-light)',
+                                  borderRadius: '9999px',
+                                  color: 'var(--text-secondary)',
+                                  fontSize: '0.75rem',
+                                  padding: '0.2rem 0.65rem',
+                                  cursor: 'pointer',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.borderColor = 'var(--border-hover)';
+                                  e.currentTarget.style.color = '#fff';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                                  e.currentTarget.style.color = 'var(--text-secondary)';
+                                }}
+                              >
+                                ↳ Ask: Required rescue equipment?
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  handleSendMessage(
+                                    'What secondary hazards (fire, utility gas leaks, water contamination) are threatened here?'
+                                  )
+                                }
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid var(--border-light)',
+                                  borderRadius: '9999px',
+                                  color: 'var(--text-secondary)',
+                                  fontSize: '0.75rem',
+                                  padding: '0.2rem 0.65rem',
+                                  cursor: 'pointer',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.borderColor = 'var(--border-hover)';
+                                  e.currentTarget.style.color = '#fff';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                                  e.currentTarget.style.color = 'var(--text-secondary)';
+                                }}
+                              >
+                                ↳ Ask: Secondary hazards?
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Plain Assistant Response */
+                          <div>
+                            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: '#f3f4f6', whiteSpace: 'pre-wrap' }}>
+                              {msg.text}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Waiting / Generating Indicator */}
+              {isSending && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    width: '100%',
+                    padding: '0.5rem 0',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: '0 2px 8px rgba(0, 114, 194, 0.2)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <img
+                      src="/logo-icon.png"
+                      alt="DisasterMind AI"
+                      style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flex: 1,
+                      gap: '0.75rem',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                        Reasoning over visual damage & checking live bulletins...
+                      </span>
+                      <span className="online-dot" />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleCancelGeneration}
+                      title="Stop assessment (Cancel)"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        border: '1px solid rgba(239, 68, 68, 0.35)',
+                        borderRadius: '6px',
+                        color: '#f87171',
+                        padding: '0.3rem 0.75rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.28)';
+                        e.currentTarget.style.borderColor = '#f87171';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                        e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+                      }}
+                    >
+                      <Square size={11} fill="currentColor" />
+                      <span>Stop</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* ============================================================ */}
+        {/* CHAT INPUT BAR (ChatGPT Style)                               */}
+        {/* ============================================================ */}
+        <div className="chat-input-wrapper">
+          <div className="chat-input-box">
+            {/* Attached Image Previews in Input Bar */}
+            {attachedPreviews.length > 0 && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  overflowX: 'auto',
+                  paddingBottom: '0.35rem',
+                  borderBottom: '1px solid var(--border-light)',
+                }}
+              >
+                {attachedPreviews.map((item, idx) => (
                   <div
                     key={idx}
                     style={{
                       position: 'relative',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       overflow: 'hidden',
-                      background: 'rgba(15, 23, 42, 0.8)',
-                      border: '1px solid rgba(56, 189, 248, 0.3)',
-                      display: 'flex',
-                      flexDirection: 'column',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      flexShrink: 0,
                     }}
                   >
                     <img
                       src={item.url}
-                      alt={`Upload ${idx + 1}`}
+                      alt={item.name}
                       style={{
-                        width: '100%',
-                        height: '85px',
+                        width: '56px',
+                        height: '56px',
                         objectFit: 'cover',
+                        display: 'block',
                       }}
                     />
-                    <div style={{
-                      padding: '0.3rem',
-                      fontSize: '0.7rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.1rem',
-                      background: 'rgba(0,0,0,0.6)'
-                    }}>
-                      <span
-                        title={item.name}
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          color: '#38bdf8',
-                          fontWeight: 500,
-                        }}
-                      >
-                        {item.name}
-                      </span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>
-                        {item.size}
-                      </span>
-                    </div>
                     <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveFile(idx);
-                      }}
+                      onClick={() => handleRemoveAttached(idx)}
                       title="Remove image"
                       style={{
                         position: 'absolute',
-                        top: '4px',
-                        right: '4px',
-                        background: 'rgba(239, 68, 68, 0.85)',
-                        color: '#fff',
-                        border: 'none',
+                        top: '2px',
+                        right: '2px',
+                        width: '18px',
+                        height: '18px',
                         borderRadius: '50%',
-                        width: '20px',
-                        height: '20px',
-                        cursor: 'pointer',
-                        fontSize: '0.7rem',
+                        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                        border: 'none',
+                        color: '#fff',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        lineHeight: 1,
+                        cursor: 'pointer',
                       }}
                     >
-                      ✕
+                      <X size={12} />
                     </button>
                   </div>
                 ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginLeft: 'auto' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {attachedPreviews.length} image{attachedPreviews.length > 1 ? 's' : ''} ready
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearInput}
+                    title="Remove all uploaded images and text"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      textDecoration: 'underline',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                  >
+                    Clear all
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Question Input */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', fontWeight: 500 }}>
-                2. Your Question or Assessment Goal
-              </label>
-              <textarea
-                rows={3}
-                style={{
-                  width: '100%',
-                  background: 'rgba(0,0,0,0.3)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  color: '#fff',
-                  padding: '0.75rem',
-                  fontSize: '0.9rem',
-                  lineHeight: 1.4,
-                }}
-                value={intelQuestion}
-                onChange={e => setIntelQuestion(e.target.value)}
-                placeholder="Ask what is happening, where did it happen, and what caused it..."
-              />
-            </div>
-
-            {/* Live Internet Search Toggle */}
-            <div style={{ background: 'rgba(56, 189, 248, 0.08)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.2)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {/* Input Row: Attachment + Textarea + Send */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.65rem' }}>
+              {/* File Attachment Button */}
               <input
-                type="checkbox"
-                id="searchLive"
-                checked={searchLiveWeb}
-                onChange={e => setSearchLiveWeb(e.target.checked)}
-                style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#0284c7' }}
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
               />
-              <label htmlFor="searchLive" style={{ fontSize: '0.85rem', color: '#e0f2fe', cursor: 'pointer', userSelect: 'none' }}>
-                <strong>Correlate with Live Internet Disaster Feeds</strong> (USGS Seismic, ReliefWeb, GDACS Satellite Alerts)
-              </label>
-            </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                title="Attach disaster images (or drag & drop)"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid var(--border-light)',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }}
+              >
+                <Paperclip size={18} />
+              </button>
 
-            {/* Reasoning Engine Mode Switcher */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.7)',
-              padding: '0.85rem 1rem',
-              borderRadius: '8px',
-              border: '1px solid var(--border-color)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-            }}>
-              <div>
-                <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <span>{engineMode === 'fast' ? '⚡' : '🧠'}</span>
-                  <span>Reasoning Engine</span>
-                </div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-                  {engineMode === 'fast'
-                    ? 'Instant (<30ms) Zero-Shot CLIP-ViT visual feature classification'
-                    : 'Deep Multimodal Neural Reasoning via local Qwen2.5-VL on Apple Silicon MPS'}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(0,0,0,0.5)', padding: '3px', borderRadius: '7px' }}>
+              {/* Textarea */}
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                className="chat-textarea"
+                value={inputText}
+                onChange={handleTextareaInput}
+                onKeyDown={handleKeyDown}
+                placeholder={
+                  activeSession.messages.length > 0
+                    ? 'Ask follow-up question based on this conversation or image...'
+                    : 'Upload images or ask whatever you want about disaster assessment...'
+                }
+              />
+
+              {/* Send or Stop/Cancel Button */}
+              {isSending ? (
                 <button
                   type="button"
-                  onClick={() => setEngineMode('fast')}
+                  onClick={handleCancelGeneration}
+                  title="Stop generation (Cancel)"
                   style={{
-                    padding: '0.35rem 0.75rem',
-                    fontSize: '0.78rem',
-                    borderRadius: '5px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ef4444',
                     border: 'none',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
-                    background: engineMode === 'fast' ? '#0284c7' : 'transparent',
-                    color: engineMode === 'fast' ? '#fff' : 'var(--text-muted)',
-                    fontWeight: engineMode === 'fast' ? 600 : 400,
+                    flexShrink: 0,
                     transition: 'all 0.15s ease',
+                    boxShadow: '0 0 14px rgba(239, 68, 68, 0.5)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#dc2626';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ef4444';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
-                  ⚡ Fast CLIP (&lt;30ms)
+                  <Square size={13} fill="#ffffff" />
                 </button>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => setEngineMode('deep_vlm')}
+                  disabled={!inputText.trim() && attachedFiles.length === 0}
+                  onClick={() => handleSendMessage()}
+                  title="Send message"
                   style={{
-                    padding: '0.35rem 0.75rem',
-                    fontSize: '0.78rem',
-                    borderRadius: '5px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor:
+                      inputText.trim() || attachedFiles.length > 0
+                        ? 'var(--accent-sky)'
+                        : 'rgba(255, 255, 255, 0.08)',
                     border: 'none',
-                    cursor: 'pointer',
-                    background: engineMode === 'deep_vlm' ? '#6366f1' : 'transparent',
-                    color: engineMode === 'deep_vlm' ? '#fff' : 'var(--text-muted)',
-                    fontWeight: engineMode === 'deep_vlm' ? 600 : 400,
+                    color:
+                      inputText.trim() || attachedFiles.length > 0 ? '#040711' : 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor:
+                      inputText.trim() || attachedFiles.length > 0 ? 'pointer' : 'not-allowed',
+                    flexShrink: 0,
                     transition: 'all 0.15s ease',
+                    boxShadow:
+                      inputText.trim() || attachedFiles.length > 0
+                        ? '0 0 14px rgba(56, 189, 248, 0.45)'
+                        : 'none',
                   }}
                 >
-                  🧠 Deep VLM
+                  <Send size={16} />
                 </button>
-              </div>
+              )}
             </div>
+          </div>
 
-            {/* Quick Demo Pre-sets */}
-            <div>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Quick Preset Scenarios:
-              </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                {[
-                  'What disaster is happening here and what caused it?',
-                  'Where did this happen and what is the building collapse count?',
-                  'Identify the flood trigger, extent, and live emergency reports',
-                ].map((preset, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className="btn-secondary"
-                    style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-                    onClick={() => setIntelQuestion(preset)}
-                  >
-                    💬 {preset.slice(0, 36)}...
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div
+            style={{
+              fontSize: '0.72rem',
+              color: 'var(--text-muted)',
+              textAlign: 'center',
+              marginTop: '0.45rem',
+            }}
+          >
+            DisasterMind AI evaluates multimodal imagery and USGS telemetry. Confirm emergency response with certified authorities.
+          </div>
+        </div>
+      </main>
 
-            {/* Single Unified Submit Button */}
-            <button
-              className="btn-primary"
+      {/* ============================================================ */}
+      {/* IMAGE PREVIEW LIGHTBOX MODAL                                 */}
+      {/* ============================================================ */}
+      {selectedPreviewImage && (
+        <div
+          onClick={() => setSelectedPreviewImage(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.8)',
+            }}
+          >
+            <img
+              src={selectedPreviewImage}
+              alt="Disaster Scene Inspection"
               style={{
                 width: '100%',
-                justifyContent: 'center',
-                padding: '0.95rem',
-                fontSize: '0.98rem',
-                fontWeight: 600,
-                letterSpacing: '0.01em',
-                background: 'linear-gradient(135deg, #0284c7 0%, #4f46e5 100%)',
-                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.4)',
-                border: 'none',
+                height: '100%',
+                maxHeight: '85vh',
+                objectFit: 'contain',
+                display: 'block',
               }}
-              onClick={handleAnalyzeIntelligence}
-              disabled={intelLoading}
-            >
-              {intelLoading
-                ? '⏳ Analyzing Disaster Imagery & Correlating Telemetry...'
-                : '🚀 Analyze Incident'
-              }
-            </button>
-          </div>
-
-          {/* Results Intelligence Display */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {intelError && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', borderRadius: '8px', padding: '1rem', color: '#fca5a5', fontSize: '0.88rem' }}>
-                ⚠️ <strong>Analysis Error:</strong> {intelError}
-              </div>
-            )}
-
-            {intelResult ? (
-              <>
-                {/* 1. Incident Breakdown Card */}
-                <div className="glass-panel" style={{ padding: '1.75rem', borderLeft: '4px solid #38bdf8' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <span className="badge badge-danger" style={{ fontSize: '0.8rem' }}>
-                        🚨 {intelResult.breakdown?.detected_disaster_type}
-                      </span>
-                      <span className="badge badge-success">
-                        {(intelResult.breakdown?.confidence * 100).toFixed(0)}% Confidence
-                      </span>
-                      {intelResult.images_analyzed_count > 0 && (
-                        <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>
-                          📸 {intelResult.images_analyzed_count} {intelResult.images_analyzed_count === 1 ? 'Image' : 'Images'} Analyzed
-                        </span>
-                      )}
-                    </div>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      Response: {intelResult.latency_ms} ms
-                    </span>
-                  </div>
-
-                  {/* 4 Pillars: WHAT, WHERE, HOW, IMPACT */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.9rem 1rem', borderRadius: '8px', borderLeft: '3px solid #38bdf8' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', marginBottom: '0.25rem', letterSpacing: '0.04em' }}>
-                        📌 What Happened:
-                      </div>
-                      <div style={{ fontSize: '0.92rem', color: '#f8fafc', lineHeight: 1.5 }}>
-                        {intelResult.breakdown?.what_happened}
-                      </div>
-                    </div>
-
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.9rem 1rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#10b981', textTransform: 'uppercase', marginBottom: '0.25rem', letterSpacing: '0.04em' }}>
-                        📍 Where It Happened:
-                      </div>
-                      <div style={{ fontSize: '0.92rem', color: '#f8fafc', lineHeight: 1.5 }}>
-                        {intelResult.breakdown?.where_it_happened}
-                      </div>
-                    </div>
-
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.9rem 1rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', marginBottom: '0.25rem', letterSpacing: '0.04em' }}>
-                        ⚡ How It Happened (Mechanisms & Causes):
-                      </div>
-                      <div style={{ fontSize: '0.92rem', color: '#f8fafc', lineHeight: 1.5 }}>
-                        {intelResult.breakdown?.how_it_happened}
-                      </div>
-                    </div>
-
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.9rem 1rem', borderRadius: '8px', borderLeft: '3px solid #f43f5e' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f43f5e', textTransform: 'uppercase', marginBottom: '0.25rem', letterSpacing: '0.04em' }}>
-                        ⚠️ Impact & Damage Extent:
-                      </div>
-                      <div style={{ fontSize: '0.92rem', color: '#f8fafc', lineHeight: 1.5 }}>
-                        {intelResult.breakdown?.impact_and_severity}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Live Internet Evidence Bulletins */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      🌐 Live Internet Evidence Found ({intelResult.live_internet_evidence?.length || 0})
-                    </h3>
-                    <span className="badge badge-info" style={{ fontSize: '0.72rem' }}>
-                      Verified Online Feeds
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {intelResult.live_internet_evidence?.map((item, idx) => (
-                      <div key={idx} style={{ background: 'rgba(0,0,0,0.3)', padding: '0.9rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.35rem' }}>
-                          <span style={{ fontWeight: 600, color: '#38bdf8', fontSize: '0.88rem' }}>
-                            {item.title}
-                          </span>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.timestamp}</span>
-                        </div>
-                        <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.45, marginBottom: '0.4rem' }}>
-                          {item.snippet}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                          <span style={{ color: 'var(--text-muted)' }}>
-                            <strong>Source:</strong> {item.source_name}
-                          </span>
-                          {item.source_url && (
-                            <a
-                              href={item.source_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{ color: '#0284c7', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
-                            >
-                              🔗 View Live Source ↗
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 3. Where Did This Info Come From (Provenance Audit) */}
-                <div className="glass-panel" style={{ padding: '1.25rem 1.5rem' }}>
-                  <h4 style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    🔍 Where Did This Information Come From? (Source Provenance)
-                  </h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
-                    {intelResult.source_provenance?.map((prov, idx) => (
-                      <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#34d399', marginBottom: '0.2rem' }}>
-                          ✓ {prov.source}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                          {prov.details}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="glass-panel" style={{ padding: '4rem 2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '440px' }}>
-                <span style={{ fontSize: '3.5rem', marginBottom: '1rem', opacity: 0.5 }}>🛰️</span>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-                  Ready to Analyze Any Image & Question
-                </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', maxWidth: '420px', lineHeight: 1.5 }}>
-                  Upload an image on the left, type a question, and click <strong>Find Out What, Where, How</strong> to see visual intelligence correlated with live internet feeds.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: Classic RAG */}
-      {activeTab === 'rag' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-          <div className="glass-panel" style={{ padding: '1.75rem' }}>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1.25rem', color: 'var(--accent-blue)' }}>
-              Corpus RAG Query
-            </h2>
-            <textarea
-              rows={3}
-              style={{ width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: '8px', color: '#fff', padding: '0.75rem', fontSize: '0.9rem', marginBottom: '1rem' }}
-              value={ragQuestion}
-              onChange={e => setRagQuestion(e.target.value)}
             />
-            <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={handleRunRAG} disabled={ragLoading}>
-              {ragLoading ? 'Running...' : 'Execute RAG'}
+            <button
+              onClick={() => setSelectedPreviewImage(null)}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <X size={18} />
             </button>
-          </div>
-
-          <div>
-            {ragError && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', borderRadius: '8px', padding: '1rem', color: '#fca5a5', marginBottom: '1rem', fontSize: '0.88rem' }}>
-                ⚠️ <strong>Query Error:</strong> {ragError}
-              </div>
-            )}
-            {ragResult && (
-              <div className="glass-panel" style={{ padding: '1.75rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem' }}>RAG Prediction</h3>
-                <p style={{ fontSize: '0.95rem', color: '#f8fafc', marginBottom: '1rem' }}>{ragResult.prediction}</p>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Latency: {ragResult.total_latency_ms} ms</div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: Live Feeds */}
-      {activeTab === 'live' && (
-        <div className="glass-panel" style={{ padding: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Real-Time Disaster Bulletins (USGS / Global Feeds)
-              </h2>
-            </div>
-            <button className="btn-primary" onClick={handleFetchLiveFeeds} disabled={fetchingFeed}>
-              {fetchingFeed ? 'Refreshing...' : '🔄 Poll Live Feeds'}
-            </button>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1rem' }}>
-            {liveItems.map((item, idx) => (
-              <div key={idx} style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                <span className="badge badge-danger" style={{ marginBottom: '0.5rem' }}>{item.severity}</span>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.5rem' }}>{item.title}</h3>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{item.summary}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: Stats */}
-      {activeTab === 'stats' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-          <div className="glass-panel" style={{ padding: '1.75rem' }}>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>DisasterM3 Records</div>
-            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent-blue)' }}>1,599</div>
-          </div>
-          <div className="glass-panel" style={{ padding: '1.75rem' }}>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Standardized Corpus</div>
-            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent-emerald)' }}>1,263</div>
           </div>
         </div>
       )}
