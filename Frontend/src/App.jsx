@@ -24,7 +24,8 @@ import {
   Flame,
   Waves,
   Building2,
-  Wind
+  Wind,
+  Square
 } from 'lucide-react';
 
 const STORAGE_KEY = 'disastermind_chat_sessions_v1';
@@ -78,6 +79,7 @@ export default function App() {
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
   const chatScrollContainerRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   // Save sessions to localStorage
   useEffect(() => {
@@ -220,6 +222,15 @@ export default function App() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Stop / Cancel ongoing generation
+  const handleCancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsSending(false);
+  };
+
   // Drag and drop images into chat
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -298,6 +309,8 @@ export default function App() {
     setAttachedPreviews([]);
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     setIsSending(true);
 
     try {
@@ -335,6 +348,7 @@ export default function App() {
       const res = await fetch('/api/v1/intelligence/analyze-upload', {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
 
       if (!res.ok) {
@@ -369,6 +383,29 @@ export default function App() {
         })
       );
     } catch (err) {
+      if (err.name === 'AbortError' || controller.signal.aborted) {
+        const cancelledMessage = {
+          id: assistantMessageId,
+          role: 'assistant',
+          isCancelled: true,
+          text: 'Assessment stopped by user.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+
+        setSessions((prevSessions) =>
+          prevSessions.map((session) => {
+            if (session.id === activeSession.id) {
+              return {
+                ...session,
+                messages: [...session.messages, cancelledMessage],
+              };
+            }
+            return session;
+          })
+        );
+        return;
+      }
+
       const errorMessage = {
         id: assistantMessageId,
         role: 'assistant',
@@ -390,11 +427,17 @@ export default function App() {
       );
     } finally {
       setIsSending(false);
+      abortControllerRef.current = null;
     }
   };
 
-  // Keyboard shortcut: Enter sends message (Shift+Enter inserts newline)
+  // Keyboard shortcut: Enter sends message (Shift+Enter inserts newline), Escape cancels
   const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && isSending) {
+      e.preventDefault();
+      handleCancelGeneration();
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (!isSending) {
@@ -440,12 +483,22 @@ export default function App() {
         <div style={{ padding: '0.85rem 0.85rem 0.5rem 0.85rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
           {/* Top Brand & Collapse */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.2rem 0.35rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <img
+                src="/logo-icon.png"
+                alt="DisasterMind Icon"
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 2px 6px rgba(0, 114, 194, 0.4))',
+                }}
+              />
               <img
                 src="/logo-white.png"
                 alt="DisasterMind Logo"
                 style={{
-                  height: '26px',
+                  height: '22px',
                   width: 'auto',
                   objectFit: 'contain',
                 }}
@@ -765,12 +818,13 @@ export default function App() {
                   <PanelLeft size={19} />
                 </button>
                 <img
-                  src="/logo-white.png"
+                  src="/logo-icon.png"
                   alt="DisasterMind Logo"
                   style={{
-                    height: '22px',
-                    width: 'auto',
+                    width: '24px',
+                    height: '24px',
                     objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 6px rgba(0, 114, 194, 0.4))',
                   }}
                 />
               </div>
@@ -790,6 +844,11 @@ export default function App() {
                 color: '#ececec',
               }}
             >
+              <img
+                src="/logo-icon.png"
+                alt="DisasterMind"
+                style={{ width: '15px', height: '15px', objectFit: 'contain' }}
+              />
               <span>DisasterMind 3B</span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
                 · {engineMode === 'deep_vlm' ? 'Neural MPS' : 'CLIP Fast'}
@@ -1048,7 +1107,7 @@ export default function App() {
                         }}
                       >
                         <img
-                          src="/favicon.png"
+                          src="/logo-icon.png"
                           alt="DisasterMind AI"
                           style={{ width: '22px', height: '22px', objectFit: 'contain' }}
                         />
@@ -1056,7 +1115,25 @@ export default function App() {
 
                       {/* Content Box */}
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                        {msg.isError ? (
+                        {msg.isCancelled ? (
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
+                              borderRadius: '8px',
+                              padding: '0.6rem 0.9rem',
+                              color: 'var(--text-muted)',
+                              fontSize: '0.86rem',
+                              width: 'fit-content',
+                            }}
+                          >
+                            <Square size={13} fill="currentColor" color="#ef4444" />
+                            <span>Assessment stopped by user.</span>
+                          </div>
+                        ) : msg.isError ? (
                           <div
                             style={{
                               backgroundColor: 'rgba(244, 63, 94, 0.1)',
@@ -1373,18 +1450,60 @@ export default function App() {
                     }}
                   >
                     <img
-                      src="/favicon.png"
+                      src="/logo-icon.png"
                       alt="DisasterMind AI"
                       style={{ width: '22px', height: '22px', objectFit: 'contain' }}
                     />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                      {engineMode === 'deep_vlm'
-                        ? 'Reasoning over visual damage & checking live bulletins...'
-                        : 'Running zero-shot CLIP classification...'}
-                    </span>
-                    <span className="online-dot" />
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flex: 1,
+                      gap: '0.75rem',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                        {engineMode === 'deep_vlm'
+                          ? 'Reasoning over visual damage & checking live bulletins...'
+                          : 'Running zero-shot CLIP classification...'}
+                      </span>
+                      <span className="online-dot" />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleCancelGeneration}
+                      title="Stop assessment (Cancel)"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        border: '1px solid rgba(239, 68, 68, 0.35)',
+                        borderRadius: '6px',
+                        color: '#f87171',
+                        padding: '0.3rem 0.75rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.28)';
+                        e.currentTarget.style.borderColor = '#f87171';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                        e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+                      }}
+                    >
+                      <Square size={11} fill="currentColor" />
+                      <span>Stop</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -1455,9 +1574,30 @@ export default function App() {
                     </button>
                   </div>
                 ))}
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {attachedPreviews.length} image{attachedPreviews.length > 1 ? 's' : ''} ready
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginLeft: 'auto' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {attachedPreviews.length} image{attachedPreviews.length > 1 ? 's' : ''} ready
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearInput}
+                    title="Remove all uploaded images and text"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      textDecoration: 'underline',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                  >
+                    Clear all
+                  </button>
+                </div>
               </div>
             )}
 
@@ -1517,35 +1657,67 @@ export default function App() {
                 }
               />
 
-              {/* Send Button */}
-              <button
-                type="button"
-                disabled={isSending || (!inputText.trim() && attachedFiles.length === 0)}
-                onClick={() => handleSendMessage()}
-                title="Send message"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  backgroundColor:
-                    inputText.trim() || attachedFiles.length > 0
-                      ? 'var(--accent-green)'
-                      : 'rgba(255, 255, 255, 0.1)',
-                  border: 'none',
-                  color:
-                    inputText.trim() || attachedFiles.length > 0 ? '#ffffff' : 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor:
-                    inputText.trim() || attachedFiles.length > 0 ? 'pointer' : 'not-allowed',
-                  flexShrink: 0,
-                  transition: 'all 0.15s ease',
-                  opacity: isSending ? 0.6 : 1,
-                }}
-              >
-                <Send size={16} />
-              </button>
+              {/* Send or Stop/Cancel Button */}
+              {isSending ? (
+                <button
+                  type="button"
+                  onClick={handleCancelGeneration}
+                  title="Stop generation (Cancel)"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ef4444',
+                    border: 'none',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease',
+                    boxShadow: '0 0 14px rgba(239, 68, 68, 0.5)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#dc2626';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ef4444';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <Square size={13} fill="#ffffff" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={!inputText.trim() && attachedFiles.length === 0}
+                  onClick={() => handleSendMessage()}
+                  title="Send message"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor:
+                      inputText.trim() || attachedFiles.length > 0
+                        ? 'var(--accent-green)'
+                        : 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    color:
+                      inputText.trim() || attachedFiles.length > 0 ? '#ffffff' : 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor:
+                      inputText.trim() || attachedFiles.length > 0 ? 'pointer' : 'not-allowed',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Send size={16} />
+                </button>
+              )}
             </div>
           </div>
 
