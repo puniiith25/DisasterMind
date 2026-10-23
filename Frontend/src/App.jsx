@@ -31,9 +31,29 @@ import {
 const STORAGE_KEY = 'disastermind_chat_sessions_v1';
 
 export default function App() {
+  // Responsive mobile state
+  const [isMobile, setIsMobile] = useState(() => {
+    return typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  });
+
   // Sidebar & System state
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [engineMode, setEngineMode] = useState('deep_vlm'); // 'deep_vlm' | 'fast'
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    return typeof window !== 'undefined' ? window.innerWidth >= 768 : true;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const engineMode = 'deep_vlm';
   const [searchLiveWeb, setSearchLiveWeb] = useState(true);
   const [systemStatus, setSystemStatus] = useState({ online: true, points: 1263, vlmReady: true });
   const [selectedPreviewImage, setSelectedPreviewImage] = useState(null);
@@ -147,6 +167,7 @@ export default function App() {
     setSessions((prev) => [newSession, ...prev]);
     setActiveSessionId(newSession.id);
     clearInput();
+    if (isMobile) setSidebarOpen(false);
   };
 
   // Delete Chat Session
@@ -476,6 +497,11 @@ export default function App() {
 
   return (
     <div className="chat-container" onDragOver={handleDragOver} onDrop={handleDrop}>
+      {/* Mobile backdrop */}
+      {isMobile && sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* ============================================================ */}
       {/* SIDEBAR (ChatGPT Style)                                      */}
       {/* ============================================================ */}
@@ -533,8 +559,8 @@ export default function App() {
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%',
-              backgroundColor: '#212121',
-              color: '#ececec',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)',
               border: '1px solid var(--border-light)',
               borderRadius: '10px',
               padding: '0.65rem 0.85rem',
@@ -544,12 +570,12 @@ export default function App() {
               transition: 'all 0.15s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border-hover)';
-              e.currentTarget.style.backgroundColor = '#262626';
+              e.currentTarget.style.borderColor = 'var(--accent-sky)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'var(--border-light)';
-              e.currentTarget.style.backgroundColor = '#212121';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
@@ -576,6 +602,7 @@ export default function App() {
                 onClick={() => {
                   setActiveSessionId(session.id);
                   clearInput();
+                  if (isMobile) setSidebarOpen(false);
                 }}
                 style={{
                   display: 'flex',
@@ -583,15 +610,16 @@ export default function App() {
                   justifyContent: 'space-between',
                   padding: '0.55rem 0.75rem',
                   borderRadius: '8px',
-                  backgroundColor: isActive ? '#212121' : 'transparent',
+                  backgroundColor: isActive ? 'var(--bg-session-active)' : 'transparent',
+                  border: isActive ? '1px solid var(--border-sky)' : '1px solid transparent',
                   color: isActive ? '#ffffff' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontSize: '0.85rem',
-                  transition: 'background-color 0.15s ease',
+                  transition: 'all 0.15s ease',
                   group: 'session-row',
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.backgroundColor = '#1e1e1e';
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-card-hover)';
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
@@ -652,61 +680,25 @@ export default function App() {
             backgroundColor: '#141414',
           }}
         >
-          {/* Engine Mode Toggle */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Cpu size={13} color="#38bdf8" />
-                Reasoning Engine
-              </span>
-              <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>
-                {engineMode === 'deep_vlm' ? 'Qwen2.5-VL' : 'CLIP Fast'}
-              </span>
+          {/* Reasoning Engine Indicator */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.45rem 0.55rem',
+              borderRadius: '8px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.75rem' }}>
+              <Cpu size={13} color="var(--accent-sky)" />
+              <span style={{ color: 'var(--text-secondary)' }}>Reasoning Engine</span>
             </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                backgroundColor: '#212121',
-                padding: '2px',
-                borderRadius: '8px',
-                border: '1px solid var(--border-light)',
-              }}
-            >
-              <button
-                onClick={() => setEngineMode('deep_vlm')}
-                style={{
-                  padding: '0.35rem 0.5rem',
-                  fontSize: '0.75rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: engineMode === 'deep_vlm' ? '#333333' : 'transparent',
-                  color: engineMode === 'deep_vlm' ? '#ffffff' : 'var(--text-muted)',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                Deep Neural
-              </button>
-              <button
-                onClick={() => setEngineMode('fast')}
-                style={{
-                  padding: '0.35rem 0.5rem',
-                  fontSize: '0.75rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: engineMode === 'fast' ? '#333333' : 'transparent',
-                  color: engineMode === 'fast' ? '#ffffff' : 'var(--text-muted)',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                Fast CLIP
-              </button>
-            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--accent-sky)', fontWeight: 600 }}>
+              Deep Neural
+            </span>
           </div>
 
           {/* Live Web Telemetry Toggle */}
@@ -718,13 +710,13 @@ export default function App() {
               justifyContent: 'space-between',
               padding: '0.45rem 0.55rem',
               borderRadius: '8px',
-              backgroundColor: '#212121',
+              backgroundColor: 'var(--bg-card)',
               border: '1px solid var(--border-light)',
               cursor: 'pointer',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.75rem' }}>
-              <Globe size={13} color={searchLiveWeb ? '#38bdf8' : 'var(--text-muted)'} />
+              <Globe size={13} color={searchLiveWeb ? 'var(--accent-sky)' : 'var(--text-muted)'} />
               <span style={{ color: searchLiveWeb ? '#ececec' : 'var(--text-muted)' }}>USGS Live Telemetry</span>
             </div>
             <div
@@ -732,7 +724,7 @@ export default function App() {
                 width: '28px',
                 height: '16px',
                 borderRadius: '9999px',
-                backgroundColor: searchLiveWeb ? '#10a37f' : '#3f3f46',
+                backgroundColor: searchLiveWeb ? 'var(--accent-sky)' : '#334155',
                 position: 'relative',
                 transition: 'background-color 0.2s ease',
               }}
@@ -785,23 +777,25 @@ export default function App() {
       <main className="chat-main">
         {/* Top Header Bar */}
         <header
+          className="chat-header"
           style={{
-            height: '48px',
+            height: '52px',
             borderBottom: '1px solid var(--border-light)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0 1rem',
-            backgroundColor: '#212121',
+            backgroundColor: 'var(--bg-header)',
+            backdropFilter: 'blur(12px)',
             zIndex: 20,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            {!sidebarOpen && (
+            {(!sidebarOpen || isMobile) && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                 <button
-                  onClick={() => setSidebarOpen(true)}
-                  title="Open sidebar"
+                  onClick={() => setSidebarOpen((prev) => !prev)}
+                  title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
                   style={{
                     background: 'transparent',
                     border: 'none',
@@ -838,10 +832,11 @@ export default function App() {
                 gap: '0.45rem',
                 padding: '0.25rem 0.65rem',
                 borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                border: '1px solid var(--border-light)',
                 fontSize: '0.85rem',
                 fontWeight: 500,
-                color: '#ececec',
+                color: '#f0f6fc',
               }}
             >
               <img
@@ -850,8 +845,8 @@ export default function App() {
                 style={{ width: '15px', height: '15px', objectFit: 'contain' }}
               />
               <span>DisasterMind 3B</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                · {engineMode === 'deep_vlm' ? 'Neural MPS' : 'CLIP Fast'}
+              <span className="hide-on-mobile" style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                · Deep Neural VLM
               </span>
             </div>
           </div>
@@ -922,6 +917,7 @@ export default function App() {
               <img
                 src="/logo-white.png"
                 alt="DisasterMind: AI For A Safer Tomorrow"
+                className="hero-logo"
                 style={{
                   height: '68px',
                   width: 'auto',
@@ -933,6 +929,7 @@ export default function App() {
               />
 
               <h1
+                className="hero-title"
                 style={{
                   fontSize: '1.85rem',
                   fontWeight: 600,
@@ -944,6 +941,7 @@ export default function App() {
                 How can I assist your disaster assessment?
               </h1>
               <p
+                className="hero-desc"
                 style={{
                   color: 'var(--text-secondary)',
                   fontSize: '0.95rem',
@@ -958,6 +956,7 @@ export default function App() {
 
               {/* Starter Quick Actions Grid */}
               <div
+                className="starter-card-grid"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
@@ -1214,13 +1213,14 @@ export default function App() {
 
                               {/* WHERE & HOW Grid */}
                               <div
+                                className="pillar-grid"
                                 style={{
                                   display: 'grid',
                                   gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
                                   borderBottom: '1px solid var(--border-light)',
                                 }}
                               >
-                                <div style={{ padding: '0.85rem 1.15rem', borderRight: '1px solid var(--border-light)' }}>
+                                <div className="pillar-border-right" style={{ padding: '0.85rem 1.15rem', borderRight: '1px solid var(--border-light)' }}>
                                   <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#fbbf24', fontWeight: 600, marginBottom: '0.25rem' }}>
                                     Where (Setting & Terrain)
                                   </div>
@@ -1230,7 +1230,7 @@ export default function App() {
                                 </div>
 
                                 <div style={{ padding: '0.85rem 1.15rem' }}>
-                                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#a78bfa', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 600, marginBottom: '0.25rem' }}>
                                     How (Physical Mechanism)
                                   </div>
                                   <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -1240,8 +1240,8 @@ export default function App() {
                               </div>
 
                               {/* IMPACT & ANSWER */}
-                              <div style={{ padding: '0.95rem 1.15rem', backgroundColor: 'rgba(16, 163, 127, 0.04)' }}>
-                                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#34d399', fontWeight: 600, marginBottom: '0.25rem' }}>
+                              <div style={{ padding: '0.95rem 1.15rem', backgroundColor: 'rgba(56, 189, 248, 0.06)' }}>
+                                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 600, marginBottom: '0.25rem' }}>
                                   Impact & Assessment Answer
                                 </div>
                                 <div style={{ fontSize: '0.92rem', color: '#ffffff', lineHeight: 1.55, fontWeight: 450 }}>
@@ -1467,9 +1467,7 @@ export default function App() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                       <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                        {engineMode === 'deep_vlm'
-                          ? 'Reasoning over visual damage & checking live bulletins...'
-                          : 'Running zero-shot CLIP classification...'}
+                        Reasoning over visual damage & checking live bulletins...
                       </span>
                       <span className="online-dot" />
                     </div>
@@ -1701,11 +1699,11 @@ export default function App() {
                     borderRadius: '50%',
                     backgroundColor:
                       inputText.trim() || attachedFiles.length > 0
-                        ? 'var(--accent-green)'
-                        : 'rgba(255, 255, 255, 0.1)',
+                        ? 'var(--accent-sky)'
+                        : 'rgba(255, 255, 255, 0.08)',
                     border: 'none',
                     color:
-                      inputText.trim() || attachedFiles.length > 0 ? '#ffffff' : 'var(--text-muted)',
+                      inputText.trim() || attachedFiles.length > 0 ? '#040711' : 'var(--text-muted)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1713,6 +1711,10 @@ export default function App() {
                       inputText.trim() || attachedFiles.length > 0 ? 'pointer' : 'not-allowed',
                     flexShrink: 0,
                     transition: 'all 0.15s ease',
+                    boxShadow:
+                      inputText.trim() || attachedFiles.length > 0
+                        ? '0 0 14px rgba(56, 189, 248, 0.45)'
+                        : 'none',
                   }}
                 >
                   <Send size={16} />
