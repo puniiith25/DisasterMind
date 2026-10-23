@@ -69,7 +69,7 @@ class QwenVLMService:
         self.processor: Any = None
         self.is_loaded: bool = False
         self._is_loading: bool = False
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self.load_time_seconds: float = 0.0
 
     def is_ready(self) -> bool:

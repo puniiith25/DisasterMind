@@ -27,8 +27,8 @@ def parse_args():
     parser.add_argument(
         "--qa-dataset",
         type=str,
-        default="data/disasterm3/disasterm3_qa.json",
-        help="Path to DisasterM3 QA dataset",
+        default="data/disasterm3/splits/train.json",
+        help="Path to DisasterM3 QA dataset or split (default: train split)",
     )
     parser.add_argument(
         "--dev-corpus",
@@ -37,15 +37,27 @@ def parse_args():
         help="Path to development retrieval corpus",
     )
     parser.add_argument(
+        "--include-dev-corpus",
+        action="store_true",
+        default=False,
+        help="Include dev_corpus.json items (disabled by default to prevent evaluation leakage)",
+    )
+    parser.add_argument(
+        "--exclude-splits",
+        nargs="*",
+        default=["data/disasterm3/splits/dev.json", "data/disasterm3/splits/test.json"],
+        help="Paths to split JSONs whose sample IDs and exact QA pairs must be excluded",
+    )
+    parser.add_argument(
         "--output",
         type=str,
-        default="data/disasterm3/retrieval/standardized_corpus.json",
-        help="Destination path for standardized evidence corpus JSON",
+        default="data/disasterm3/retrieval/clean_train_corpus.json",
+        help="Destination path for standardized evidence corpus JSON (default: clean_train_corpus.json)",
     )
     parser.add_argument(
         "--stats-output",
         type=str,
-        default="data/reports/corpus_statistics.json",
+        default="data/reports/clean_corpus_statistics.json",
         help="Destination path for corpus statistics report JSON",
     )
     return parser.parse_args()
@@ -70,30 +82,56 @@ def main():
     if not stats_path.is_absolute():
         stats_path = (BACKEND_DIR / stats_path).resolve()
 
+    # Collect excluded IDs and QA pairs from specified evaluation splits
+    exclude_ids = set()
+    exclude_pairs = set()
+    if args.exclude_splits:
+        for s_path_str in args.exclude_splits:
+            s_path = Path(s_path_str)
+            if not s_path.is_absolute():
+                s_path = (BACKEND_DIR / s_path).resolve()
+            if s_path.exists():
+                with open(s_path, "r", encoding="utf-8") as f:
+                    split_records = json.load(f)
+                for rec in split_records:
+                    if rec.get("id"):
+                        exclude_ids.add(str(rec["id"]))
+                    q = rec.get("question", "").strip().lower()
+                    a = str(rec.get("answer", "")).strip().lower()
+                    if q and a:
+                        exclude_pairs.add((q, a))
+
     print("=" * 70)
     print("DISASTERM3 STANDARDIZED EVIDENCE CORPUS GENERATOR")
     print("=" * 70)
-    print(f"QA dataset       : {qa_path}")
-    print(f"Dev corpus       : {dev_path}")
-    print(f"Output path      : {output_path}")
-    print(f"Statistics path  : {stats_path}")
+    print(f"QA dataset          : {qa_path}")
+    print(f"Include dev corpus  : {args.include_dev_corpus}")
+    print(f"Excluded sample IDs : {len(exclude_ids)}")
+    print(f"Excluded QA pairs   : {len(exclude_pairs)}")
+    print(f"Output path         : {output_path}")
+    print(f"Statistics path     : {stats_path}")
     print("-" * 70)
 
     with open(qa_path, "r", encoding="utf-8") as f:
         qa_records = json.load(f)
 
     dev_records = []
-    if dev_path.exists():
+    if args.include_dev_corpus and dev_path.exists():
         with open(dev_path, "r", encoding="utf-8") as f:
             dev_records = json.load(f)
 
     generator = EvidenceCorpusGenerator(base_dir=BACKEND_DIR)
-    corpus, stats = generator.build_corpus(qa_records, dev_records)
+    corpus, stats = generator.build_corpus(
+        qa_records=qa_records,
+        retrieval_records=dev_records if dev_records else None,
+        exclude_record_ids=exclude_ids,
+        exclude_qa_pairs=exclude_pairs,
+    )
 
     saved_corpus_path = generator.save_corpus(corpus, output_path)
     saved_stats_path = generator.save_statistics(stats, stats_path)
 
-    print(f"Successfully generated {stats.total_records} evidence records.")
+    print(f"Successfully generated {stats.total_records} clean evidence records.")
     print(f"  Corpus saved to      : {saved_corpus_path}")
     print(f"  Statistics saved to  : {saved_stats_path}")
 

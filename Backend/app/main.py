@@ -17,8 +17,16 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from app.schemas.investigation import (
+    ImageMetadataInfo,
+    InvestigationGroundedAnswer,
+    LocationInvestigationRequest,
+    RouteInvestigationRequest,
+    RouteInvestigationResponse,
+)
 from app.schemas.live_feed import LiveFeedIngestRequest
 from app.schemas.rag import RAGRequest, RAGResponse
 from app.schemas.retrieval import RetrievalResponse
@@ -71,6 +79,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static file serving for uploaded disaster images
+upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
+upload_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(upload_dir)), name="uploads")
 
 
 # ---------------------------------------------------------------------------
@@ -479,6 +492,8 @@ def analyze_intelligence_upload(
     question: str = Form(...),
     search_live: bool = Form(True),
     engine_mode: str = Form("deep_vlm"),
+    conversation_history: Optional[str] = Form(None),
+    existing_image_paths: Optional[str] = Form(None),
     images: List[UploadFile] = File(default=[]),
     image: Optional[UploadFile] = File(None),
     intelligence_svc: Any = Depends(get_intelligence),
@@ -486,24 +501,45 @@ def analyze_intelligence_upload(
     """
     Accepts user uploaded image(s) + natural language question.
     Processes all uploaded scenes, performs real-time visual reasoning and live internet cross-correlation.
+    Preserves conversation context across follow-up queries.
     """
     saved_paths: List[str] = []
     try:
+        import os
         import time
         upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
         upload_dir.mkdir(parents=True, exist_ok=True)
         now_ts = int(time.time())
 
-        # Collect all uploads (both multi-file and single-file)
+        # Reuse existing paths from previous session turns if provided
+        if existing_image_paths:
+            try:
+                parsed_paths = json.loads(existing_image_paths)
+                if isinstance(parsed_paths, list):
+                    for ep in parsed_paths:
+                        if ep and os.path.exists(str(ep)) and str(ep) not in saved_paths:
+                            saved_paths.append(str(ep))
+            except Exception:
+                for ep in existing_image_paths.split(","):
+                    ep = ep.strip()
+                    if ep and os.path.exists(ep) and ep not in saved_paths:
+                        saved_paths.append(ep)
+
+        # Collect all new uploads (preventing duplicate multi/single file submissions)
         all_uploads: List[UploadFile] = []
         if images:
             all_uploads.extend(images)
-        if image and image.filename:
+        elif image and image.filename:
             all_uploads.append(image)
 
+        seen_names = set()
         for i, up in enumerate(all_uploads):
             if up and up.filename:
-                safe_name = f"upload_{now_ts}_{i}_{up.filename}"
+                base_name = os.path.basename(up.filename)
+                if base_name in seen_names:
+                    continue
+                seen_names.add(base_name)
+                safe_name = f"upload_{now_ts}_{i}_{base_name}"
                 p = upload_dir / safe_name
                 with open(p, "wb") as f:
                     f.write(up.file.read())
@@ -515,9 +551,242 @@ def analyze_intelligence_upload(
             image_paths=saved_paths if saved_paths else None,
             search_live=search_live,
             engine_mode=engine_mode,
+            conversation_history=conversation_history,
         )
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Uploaded image intelligence analysis failed: {str(exc)}",
         ) from exc
+
+
+# ---------------------------------------------------------------------------
+# Routes: Multi-Turn Conversational Vision Chat (ChatGPT-style)
+# ---------------------------------------------------------------------------
+
+
+def get_chat():
+    from app.services.chat_service import get_chat_service
+    return get_chat_service()
+
+
+@app.post(
+    "/api/v1/chat/message",
+    summary="Multi-turn Conversational Disaster Vision Chat",
+    tags=["Chat"],
+)
+def chat_message(
+    message: str = Form(...),
+    history: str = Form("[]"),
+    existing_image_paths: str = Form("[]"),
+    engine_mode: str = Form("deep_vlm"),
+    images: List[UploadFile] = File(default=[]),
+    image: Optional[UploadFile] = File(None),
+    chat_svc: Any = Depends(get_chat),
+) -> Any:
+    """
+    Handles conversational multi-turn chat on uploaded disaster imagery.
+    Turn 1 receives uploaded image + initial question.
+    Subsequent turns answer follow-up questions referencing the previous image and conversation.
+    """
+    try:
+        import time
+        upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        now_ts = int(time.time())
+
+        # Collect existing image paths
+        try:
+            active_paths: List[str] = json.loads(existing_image_paths) if existing_image_paths else []
+        except Exception:
+            active_paths = []
+
+        # Save any newly uploaded images
+        all_uploads: List[UploadFile] = []
+        if images:
+            all_uploads.extend(images)
+        if image and image.filename:
+            all_uploads.append(image)
+
+        for i, up in enumerate(all_uploads):
+            if up and up.filename:
+                safe_name = f"chat_{now_ts}_{i}_{up.filename}"
+                p = upload_dir / safe_name
+                with open(p, "wb") as f:
+                    f.write(up.file.read())
+                active_paths.append(str(p))
+
+        # Parse history
+        try:
+            parsed_history = json.loads(history) if history else []
+        except Exception:
+            parsed_history = []
+
+        return chat_svc.chat(
+            message=message,
+            history=parsed_history,
+            image_paths=active_paths,
+            engine_mode=engine_mode,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Chat reasoning failed: {str(exc)}",
+        ) from exc
+
+
+# ---------------------------------------------------------------------------
+# Dependency Providers for Current Disaster & Route Intelligence
+# ---------------------------------------------------------------------------
+
+
+def get_investigation() -> Any:
+    from app.services.disaster_investigation_service import get_investigation_service
+    return get_investigation_service()
+
+
+def get_route_risk() -> Any:
+    from app.services.route_risk_service import get_route_risk_service
+    return get_route_risk_service()
+
+
+def get_metadata() -> Any:
+    from app.services.metadata_service import get_metadata_service
+    return get_metadata_service()
+
+
+def get_external_disaster() -> Any:
+    from app.services.external_disaster_service import get_external_disaster_service
+    return get_external_disaster_service()
+
+
+# ---------------------------------------------------------------------------
+# Routes: Current Disaster Intelligence & Route Risk (Stages 2 & 3)
+# ---------------------------------------------------------------------------
+
+
+@app.post(
+    "/api/v1/investigate/image",
+    response_model=InvestigationGroundedAnswer,
+    summary="Investigate Disaster Image with EXIF GPS & Grounded Answer",
+    tags=["Disaster Investigation"],
+)
+def investigate_image(
+    image: UploadFile = File(...),
+    question: str = Form("What disaster is occurring here and what damage is visible?"),
+    confirmed_location: Optional[str] = Form(None),
+    confirmed_lat: Optional[float] = Form(None),
+    confirmed_lon: Optional[float] = Form(None),
+    investigation_svc: Any = Depends(get_investigation),
+) -> InvestigationGroundedAnswer:
+    """
+    Accepts user uploaded disaster image, validates MIME/size, extracts EXIF GPS,
+    correlates with live authoritative disaster feeds and clean historical evidence,
+    and returns a standardized 10-point evidence-grounded answer.
+    """
+    try:
+        content_bytes = investigation_svc.validate_image_upload(image)
+        return investigation_svc.investigate_image(
+            image_bytes=content_bytes,
+            filename=image.filename or "upload.jpg",
+            question=question,
+            confirmed_location=confirmed_location,
+            confirmed_lat=confirmed_lat,
+            confirmed_lon=confirmed_lon,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Image investigation failed: {str(exc)}",
+        ) from exc
+
+
+@app.post(
+    "/api/v1/investigate/location",
+    response_model=InvestigationGroundedAnswer,
+    summary="Investigate Disaster Hazards by Location",
+    tags=["Disaster Investigation"],
+)
+def investigate_location(
+    request: LocationInvestigationRequest,
+    investigation_svc: Any = Depends(get_investigation),
+) -> InvestigationGroundedAnswer:
+    """
+    Investigates current and historical disaster threats for a user-confirmed location
+    across USGS, GDACS, Open-Meteo, and DisasterM3 evidence.
+    """
+    try:
+        return investigation_svc.investigate_location(request)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Location investigation failed: {str(exc)}",
+        ) from exc
+
+
+@app.post(
+    "/api/v1/investigate/route",
+    response_model=RouteInvestigationResponse,
+    summary="Investigate Transit Route Disaster & Road Hazards",
+    tags=["Route Risk Investigation"],
+)
+def investigate_route(
+    request: RouteInvestigationRequest,
+    route_svc: Any = Depends(get_route_risk),
+) -> RouteInvestigationResponse:
+    """
+    Computes highway corridor geometry between origin and destination, checks intersecting
+    seismic, storm, and multi-hazard bulletins, and generates an honest safety advisory.
+    """
+    try:
+        return route_svc.investigate_route(request)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Route risk investigation failed: {str(exc)}",
+        ) from exc
+
+
+@app.post(
+    "/api/v1/metadata/image",
+    response_model=ImageMetadataInfo,
+    summary="Extract EXIF Geolocation Metadata from Image",
+    tags=["Disaster Investigation"],
+)
+def extract_image_metadata(
+    image: UploadFile = File(...),
+    metadata_svc: Any = Depends(get_metadata),
+    investigation_svc: Any = Depends(get_investigation),
+) -> ImageMetadataInfo:
+    """
+    Fast extraction of EXIF GPS coordinates, camera model, and capture timestamp
+    without executing heavy neural models, enabling interactive UI location confirmation.
+    """
+    try:
+        content_bytes = investigation_svc.validate_image_upload(image)
+        return metadata_svc.extract_metadata(content_bytes)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Metadata extraction failed: {str(exc)}",
+        ) from exc
+
+
+@app.get(
+    "/api/v1/geocode/search",
+    summary="Search Location Coordinates via OpenStreetMap Nominatim",
+    tags=["Disaster Investigation"],
+)
+def geocode_search(
+    query: str,
+    external_svc: Any = Depends(get_external_disaster),
+) -> Dict[str, Any]:
+    """Search coordinates and standardized place names for location confirmation."""
+    res = external_svc.geocode(query)
+    if not res:
+        return {"found": False, "query": query, "result": None}
+    return {"found": True, "query": query, "result": res}

@@ -360,7 +360,6 @@ export default function App() {
         filesToSend.forEach((file) => {
           formData.append('images', file);
         });
-        formData.append('image', filesToSend[0]);
       } else if (activeSession.image_paths && activeSession.image_paths.length > 0) {
         // Reuse existing image paths from this conversation
         formData.append('existing_image_paths', JSON.stringify(activeSession.image_paths));

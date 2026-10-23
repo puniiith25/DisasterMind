@@ -13,26 +13,23 @@ from pathlib import Path
 import sys
 import time
 
-import psutil
+try:
+    import psutil
+
+    def get_process_memory_mb() -> float:
+        """Get current process memory usage in MB."""
+        process = psutil.Process()
+        return process.memory_info().rss / (1024 * 1024)
+except ImportError:
+    def get_process_memory_mb() -> float:
+        """Fallback when psutil is not installed."""
+        return 0.0
 
 # Ensure Backend/ is on sys.path
 SCRIPT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = SCRIPT_DIR.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
-
-from app.schemas.vlm import (
-    VLMBenchmarkReport,
-    VLMBenchmarkSampleResult,
-    VLMInferenceRequest,
-)
-from app.services.vlm_service import QwenVLMService
-
-
-def get_process_memory_mb() -> float:
-    """Get current process memory usage in MB."""
-    process = psutil.Process()
-    return process.memory_info().rss / (1024 * 1024)
 
 
 def parse_args():

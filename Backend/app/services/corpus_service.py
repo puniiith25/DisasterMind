@@ -216,13 +216,25 @@ class EvidenceCorpusGenerator:
         self,
         qa_records: List[Dict[str, Any]],
         retrieval_records: Optional[List[Dict[str, Any]]] = None,
+        exclude_record_ids: Optional[Set[str]] = None,
+        exclude_qa_pairs: Optional[Set[Tuple[str, str]]] = None,
     ) -> Tuple[List[EvidenceRecord], CorpusStatistics]:
-        """Generate deduplicated, standardized multimodal evidence corpus."""
+        """Generate deduplicated, standardized multimodal evidence corpus with leakage protection."""
         corpus: List[EvidenceRecord] = []
         seen_texts: Set[str] = set()
+        excluded_ids: Set[str] = set(exclude_record_ids or [])
+        excluded_pairs: Set[Tuple[str, str]] = set(exclude_qa_pairs or [])
 
         # 1. Process QA records
         for r in qa_records:
+            rec_id = str(r.get("id", ""))
+            if rec_id and rec_id in excluded_ids:
+                continue
+            q_norm = r.get("question", "").strip().lower()
+            a_norm = str(r.get("answer", "")).strip().lower()
+            if (q_norm, a_norm) in excluded_pairs:
+                continue
+
             evidence = self.create_evidence_from_qa_record(r)
             if evidence.text not in seen_texts:
                 seen_texts.add(evidence.text)
@@ -231,6 +243,14 @@ class EvidenceCorpusGenerator:
         # 2. Process retrieval records if provided
         if retrieval_records:
             for r in retrieval_records:
+                rec_id = str(r.get("id", ""))
+                if rec_id and rec_id in excluded_ids:
+                    continue
+                q_norm = r.get("question", "").strip().lower()
+                a_norm = str(r.get("answer", "")).strip().lower()
+                if (q_norm, a_norm) in excluded_pairs:
+                    continue
+
                 evidence = self.create_evidence_from_retrieval_item(r)
                 if evidence.text not in seen_texts:
                     seen_texts.add(evidence.text)

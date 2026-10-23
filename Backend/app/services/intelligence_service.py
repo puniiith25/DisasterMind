@@ -37,6 +37,13 @@ logger = logging.getLogger(__name__)
 # Pre-defined domain disaster profiles for CLIP zero-shot visual classification
 DISASTER_PROFILES: List[Dict[str, str]] = [
     {
+        "type": "Non-Disaster / Normal Scene",
+        "prompt": "A standard photo of everyday objects, artwork, promotional movie poster, portrait, indoor room, or normal landscape without disaster damage",
+        "where": "Everyday visual environment",
+        "how": "No structural failure or disaster observed",
+        "impact": "Normal conditions; no emergency disaster response required",
+    },
+    {
         "type": "Earthquake",
         "prompt": "A photo of an earthquake with collapsed multi-story concrete buildings, structural rubble, and buckled street pavement",
         "where": "Urban or residential district with multi-story structural architecture",
@@ -161,66 +168,89 @@ class IncidentIntelligenceService:
         self, query: str, disaster_type: Optional[str] = None
     ) -> List[LiveInternetEvidenceItem]:
         """
-        Fetch real live incident bulletins directly from online disaster monitoring services.
-        Only attaches USGS seismic feeds if the disaster is an Earthquake or query mentions seismic terms.
+        Fetch real live incident bulletins directly from online disaster monitoring services (USGS).
+        Only attaches USGS seismic feeds if:
+        1. disaster_type is Earthquake OR query explicitly asks about earthquakes/seismic events.
+        2. Never attaches if disaster_type is Non-Disaster / Normal Scene.
+        3. Only returns items if there is geographic overlap with the query or if the user explicitly asked for recent/global earthquakes.
         """
+        d_lower = (disaster_type or "").lower()
+        if "non-disaster" in d_lower or "normal" in d_lower or "not a disaster" in d_lower:
+            return []
+
+        q_lower = query.lower()
         is_seismic = (
-            (disaster_type and "earthquake" in disaster_type.lower())
-            or any(w in query.lower() for w in ["earthquake", "quake", "tremor", "seismic", "fault", "rubble", "collapse"])
+            "earthquake" in d_lower
+            or any(w in q_lower for w in ["earthquake", "quake", "tremor", "seismic", "fault line", "usgs"])
         )
 
-        # If detected disaster is not earthquake and query doesn't mention seismic terms,
-        # do not inject irrelevant earthquakes.
         if not is_seismic:
             return []
+
+        user_wants_global = any(
+            w in q_lower
+            for w in ["recent", "latest", "global", "world", "bulletin", "usgs", "any earthquake", "feed", "live"]
+        )
 
         global _LIVE_FEED_CACHE
         now = time.time()
 
+        raw_items: List[LiveInternetEvidenceItem] = []
         if _LIVE_FEED_CACHE["items"] and (now - _LIVE_FEED_CACHE["timestamp"] < 300.0):
-            return list(_LIVE_FEED_CACHE["items"])
+            raw_items = list(_LIVE_FEED_CACHE["items"])
+        else:
+            try:
+                usgs_url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson"
+                req = urllib.request.Request(usgs_url, headers={"User-Agent": "DisasterMind-Engine/1.0"})
+                with urllib.request.urlopen(req, timeout=2.5) as resp:
+                    if resp.status == 200:
+                        data = json.loads(resp.read().decode("utf-8"))
+                        features = data.get("features", [])
+                        for feat in features[:6]:
+                            props = feat.get("properties", {})
+                            time_sec = props.get("time", 0) / 1000.0
+                            date_str = datetime.fromtimestamp(time_sec, tz=timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+                            mag = props.get("mag", 0.0)
+                            place = props.get("place", "Global Seismic Zone")
 
-        evidence_items: List[LiveInternetEvidenceItem] = []
-
-        try:
-            usgs_url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson"
-            req = urllib.request.Request(usgs_url, headers={"User-Agent": "DisasterMind-Engine/1.0"})
-            with urllib.request.urlopen(req, timeout=2.5) as resp:
-                if resp.status == 200:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    features = data.get("features", [])
-                    for feat in features[:3]:
-                        props = feat.get("properties", {})
-                        time_sec = props.get("time", 0) / 1000.0
-                        date_str = datetime.fromtimestamp(time_sec, tz=timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-                        mag = props.get("mag", 0.0)
-                        place = props.get("place", "Global Seismic Zone")
-
-                        # Assess relevance: check if query mentions the specific geographical location
-                        query_words = set(re.findall(r"\b[a-zA-Z]{3,}\b", query.lower()))
-                        place_words = set(re.findall(r"\b[a-zA-Z]{3,}\b", place.lower()))
-                        stop_words = {"what", "earthquake", "damage", "occurred", "where", "happened", "near", "region", "here", "this", "there"}
-                        geo_overlap = (query_words.intersection(place_words)) - stop_words
-                        relevance = 0.94 if geo_overlap else 0.58
-
-                        title_prefix = "Live USGS Event" if geo_overlap else "USGS Global Reference Telemetry"
-                        evidence_items.append(
-                            LiveInternetEvidenceItem(
-                                source_name="USGS Earthquake Hazards Program (Live API)",
-                                source_url=props.get("url", "https://earthquake.usgs.gov"),
-                                title=f"{title_prefix}: M {mag} - {place}",
-                                timestamp=date_str,
-                                snippet=f"Live USGS Telemetry: Magnitude {mag} seismic event recorded at {place}. Alert status: {props.get('alert') or 'Active'}.",
-                                relevance_score=relevance,
+                            raw_items.append(
+                                LiveInternetEvidenceItem(
+                                    source_name="USGS Earthquake Hazards Program (Live API)",
+                                    source_url=props.get("url", "https://earthquake.usgs.gov"),
+                                    title=f"Live USGS Event: M {mag} - {place}",
+                                    timestamp=date_str,
+                                    snippet=f"Live USGS Telemetry: Magnitude {mag} seismic event recorded at {place}. Alert status: {props.get('alert') or 'Active'}.",
+                                    relevance_score=0.90,
+                                )
                             )
-                        )
-        except Exception as exc:
-            logger.warning("USGS live feed fetch error: %s", exc)
+                        if raw_items:
+                            _LIVE_FEED_CACHE = {"timestamp": now, "items": raw_items}
+            except Exception as exc:
+                logger.warning("USGS live feed fetch error: %s", exc)
 
-        if evidence_items:
-            _LIVE_FEED_CACHE = {"timestamp": now, "items": evidence_items}
+        if not raw_items:
+            return []
 
-        return evidence_items
+        # If user explicitly asked for global/recent earthquake reports, return the top bulletins
+        if user_wants_global:
+            return raw_items[:3]
+
+        # Otherwise, filter by genuine geographic overlap with query
+        query_words = set(re.findall(r"\b[a-zA-Z]{3,}\b", q_lower))
+        stop_words = {
+            "what", "earthquake", "damage", "occurred", "where", "happened", "near",
+            "region", "here", "this", "there", "image", "photo", "picture", "show", "tell"
+        }
+        query_geo_words = query_words - stop_words
+
+        matched_items: List[LiveInternetEvidenceItem] = []
+        for item in raw_items:
+            place_words = set(re.findall(r"\b[a-zA-Z]{3,}\b", item.title.lower()))
+            if query_geo_words.intersection(place_words):
+                item.relevance_score = 0.95
+                matched_items.append(item)
+
+        return matched_items[:3]
 
     def parse_structured_breakdown(
         self,
@@ -230,7 +260,7 @@ class IncidentIntelligenceService:
     ) -> IncidentBreakdown:
         """
         Parse structured Disaster Type, Confidence, What, Where, How, and Impact from VLM output.
-        Extracts directly from model reasoning without canned text.
+        Extracts directly from model visual reasoning without synthetic, mock, or canned paragraphs.
         """
         disaster_type = ""
         confidence = 0.88
@@ -243,7 +273,7 @@ class IncidentIntelligenceService:
         type_m = re.search(r"DISASTER\s+TYPE[:\*\s]+([^\n\r\.\,]+)", vlm_text, re.IGNORECASE)
         if type_m:
             candidate = type_m.group(1).strip().strip("[]*#")
-            if candidate and len(candidate) < 40:
+            if candidate and len(candidate) < 50:
                 disaster_type = candidate
 
         # 2. Extract CONFIDENCE:
@@ -258,11 +288,11 @@ class IncidentIntelligenceService:
             except Exception:
                 pass
 
-        # 3. Extract WHAT, WHERE, HOW, IMPACT
-        what_m = re.search(r"WHAT[:\*\s]+(.*?)(?=\n\s*(?:WHERE|HOW|IMPACT|DISASTER|CONFIDENCE)|\Z)", vlm_text, re.DOTALL | re.IGNORECASE)
-        where_m = re.search(r"WHERE[:\*\s]+(.*?)(?=\n\s*(?:HOW|IMPACT|DISASTER|CONFIDENCE)|\Z)", vlm_text, re.DOTALL | re.IGNORECASE)
-        how_m = re.search(r"HOW[:\*\s]+(.*?)(?=\n\s*(?:IMPACT|DISASTER|CONFIDENCE)|\Z)", vlm_text, re.DOTALL | re.IGNORECASE)
-        impact_m = re.search(r"IMPACT[:\*\s]+(.*)", vlm_text, re.DOTALL | re.IGNORECASE)
+        # 3. Extract WHAT, WHERE, HOW, IMPACT sections with strict line start
+        what_m = re.search(r"(?:^|\n)\s*WHAT[:\*\s]+(.*?)(?=\n\s*(?:WHERE|HOW|IMPACT|DISASTER|CONFIDENCE)|\Z)", vlm_text, re.DOTALL | re.IGNORECASE)
+        where_m = re.search(r"(?:^|\n)\s*WHERE[:\*\s]+(.*?)(?=\n\s*(?:HOW|IMPACT|DISASTER|CONFIDENCE)|\Z)", vlm_text, re.DOTALL | re.IGNORECASE)
+        how_m = re.search(r"(?:^|\n)\s*HOW[:\*\s]+(.*?)(?=\n\s*(?:IMPACT|DISASTER|CONFIDENCE)|\Z)", vlm_text, re.DOTALL | re.IGNORECASE)
+        impact_m = re.search(r"(?:^|\n)\s*IMPACT[:\*\s]+(.*)", vlm_text, re.DOTALL | re.IGNORECASE)
 
         if what_m and what_m.group(1).strip():
             what = what_m.group(1).strip().strip("[]*")
@@ -273,7 +303,7 @@ class IncidentIntelligenceService:
         if impact_m and impact_m.group(1).strip():
             impact = impact_m.group(1).strip().strip("[]*")
 
-        # If model did not use exact labels, split sentences and extract
+        # Fallback if model did not use exact labels: split clean lines
         if not what:
             clean_lines = [
                 line.strip() for line in vlm_text.splitlines()
@@ -288,12 +318,29 @@ class IncidentIntelligenceService:
                 if len(clean_lines) > 3 and not impact:
                     impact = " ".join(clean_lines[3:])
 
-        # If disaster type wasn't captured in the header, infer from model's own words
-        if not disaster_type:
-            v_lower = vlm_text.lower()
-            if "earthquake" in v_lower or "seismic" in v_lower or "tremor" in v_lower:
-                disaster_type = "Earthquake"
-            elif "flood" in v_lower or "submerged" in v_lower or "inundat" in v_lower:
+        v_lower = vlm_text.lower()
+        non_disaster_signals = [
+            "non-disaster", "not a disaster", "no disaster", "normal scene",
+            "promotional poster", "movie poster", "artwork", "illustration",
+            "does not depict any disaster", "no damage", "not depict any physical damage",
+            "not a physical disaster", "purely artistic", "everyday scene", "graphic poster"
+        ]
+        is_non_disaster = (
+            any(s in (disaster_type or "").lower() for s in ["non-disaster", "normal", "none", "not a disaster", "artwork", "poster"])
+            or any(s in v_lower for s in non_disaster_signals)
+        )
+
+        if is_non_disaster:
+            disaster_type = "Non-Disaster / Normal Scene"
+            if not where:
+                where = "Everyday environment / graphic visual media"
+            if not how or "ductility" in how.lower():
+                how = "No structural failure or disaster observed"
+            if not impact or "pancake" in impact.lower() or "rescue" in impact.lower():
+                impact = "Normal conditions; no emergency disaster response required."
+        elif not disaster_type:
+            # Infer disaster type from model's factual words only if not non-disaster
+            if "flood" in v_lower or "submerged" in v_lower or "inundat" in v_lower:
                 disaster_type = "Flood"
             elif "wildfire" in v_lower or "forest fire" in v_lower or "burning" in v_lower:
                 disaster_type = "Wildfire"
@@ -305,30 +352,59 @@ class IncidentIntelligenceService:
                 disaster_type = "Industrial Explosion"
             elif "tornado" in v_lower or "twister" in v_lower:
                 disaster_type = "Tornado"
+            elif "earthquake" in v_lower or "seismic" in v_lower or "fault rupture" in v_lower:
+                disaster_type = "Earthquake"
             elif clip_fallback:
                 disaster_type = clip_fallback["type"]
                 confidence = clip_fallback["confidence"]
             else:
-                disaster_type = "Structural Disaster"
+                disaster_type = "Scene Assessment"
 
-        # Apply fallback defaults from CLIP if sections are missing
-        if clip_fallback:
-            prof = clip_fallback.get("profile", {})
-            if not where:
-                where = prof.get("where", "Identified disaster impact sector")
-            if not how:
-                how = prof.get("how", "Structural failure caused by high physical force")
-            if not impact:
-                impact = prof.get("impact", "Significant structural damage requiring emergency response")
+        # Truthful fallbacks using model context, avoiding hardcoded collapse paragraphs
+        if not what:
+            what = "Visual assessment of the scene."
+        if not where:
+            where = "Observed image setting"
+        if not how:
+            how = (
+                "Physical forces evident from visual assessment"
+                if disaster_type != "Non-Disaster / Normal Scene"
+                else "None / Not Applicable"
+            )
+        if not impact:
+            impact = (
+                "Review visual evidence and verify on-site conditions."
+                if disaster_type != "Non-Disaster / Normal Scene"
+                else "No emergency hazards identified."
+            )
 
         return IncidentBreakdown(
-            what_happened=what or "Observable structural damage and disaster impact.",
-            where_it_happened=where or "Disaster scene sector",
-            how_it_happened=how or "Physical and environmental stresses exceeding structural resistance.",
-            impact_and_severity=impact or "Severe structural compromise with emergency response required.",
+            what_happened=what,
+            where_it_happened=where,
+            how_it_happened=how,
+            impact_and_severity=impact,
             detected_disaster_type=disaster_type,
             confidence=confidence,
         )
+
+    def detect_disaster_type(self, text: str) -> str:
+        """Detect disaster type from text query or description using domain keyword patterns."""
+        v_lower = text.lower()
+        if any(w in v_lower for w in ["earthquake", "seismic", "tremor", "fault"]):
+            return "Earthquake"
+        elif any(w in v_lower for w in ["flood", "submerged", "inundat", "overflow", "waterlevel"]):
+            return "Flood"
+        elif any(w in v_lower for w in ["wildfire", "forest fire", "flame", "burning", "charred"]):
+            return "Wildfire"
+        elif any(w in v_lower for w in ["landslide", "mudslide", "rockfall"]):
+            return "Landslide"
+        elif any(w in v_lower for w in ["hurricane", "cyclone", "storm"]):
+            return "Hurricane / Severe Storm"
+        elif any(w in v_lower for w in ["explosion", "blast"]):
+            return "Industrial Explosion"
+        elif any(w in v_lower for w in ["tornado", "twister"]):
+            return "Tornado"
+        return "Disaster Incident"
 
     def analyze_incident(
         self,
@@ -337,11 +413,13 @@ class IncidentIntelligenceService:
         image_paths: Optional[List[str]] = None,
         search_live: bool = True,
         engine_mode: str = "deep_vlm",
+        conversation_history: Optional[str] = None,
     ) -> IntelligenceResponse:
         """
         Execute real vision inference and real live data correlation.
         - Supports single or multiple uploaded disaster images.
         - Defaults to real Qwen2.5-VL multimodal inference on Apple Silicon MPS / CUDA.
+        - Preserves conversational context across multi-turn follow-up queries.
         - Fast mode runs real CLIP zero-shot classification without placeholders.
         - NEVER emits hardcoded, prebuilt, or fake placeholder responses.
         """
@@ -392,7 +470,10 @@ class IncidentIntelligenceService:
                 retrieval_mode = getattr(ret_res, "fusion_mode", "text_only")
                 for item in (ret_res.fused_results or [])[:3]:
                     retrieved_snippets.append({
+                        "evidence_id": item.evidence_id,
+                        "record_id": item.record_id,
                         "task_type": item.task_type,
+                        "source_type": item.source_type,
                         "question": item.question,
                         "answer": item.answer,
                         "location": item.location,
@@ -418,29 +499,65 @@ class IncidentIntelligenceService:
             if getattr(self.vlm_service, "is_ready", lambda: False)():
                 try:
                     img_intro = (
-                        f"You are examining {len(all_image_paths)} uploaded disaster scene imagery files: {', '.join(image_specs)}.\n"
+                        f"You are examining {len(all_image_paths)} uploaded image(s): {', '.join(image_specs)}.\n"
                         if len(all_image_paths) > 1
-                        else ("Examine the uploaded disaster image.\n" if all_image_paths else "")
+                        else ("Examine the uploaded image.\n" if all_image_paths else "")
                     )
 
+                    # Build explicit evidence context block to ground generation
+                    if retrieved_snippets:
+                        evi_entries = []
+                        for idx, snip in enumerate(retrieved_snippets, start=1):
+                            eid = snip.get("evidence_id", f"EVI-{idx}")
+                            d_type = snip.get("disaster_type") or "General"
+                            loc = snip.get("location") or "Historical incident"
+                            q_text = snip.get("question", "")
+                            a_text = snip.get("answer", "")
+                            evi_entries.append(
+                                f"[Evidence {idx} (ID: {eid})]: Disaster: {d_type} | Location: {loc}\n"
+                                f"Historical Reference Q: {q_text}\n"
+                                f"Historical Observed Finding: {a_text}"
+                            )
+                        evidence_section = (
+                            "\n=== OPTIONAL HISTORICAL REFERENCE ARCHIVE (DisasterM3) ===\n"
+                            + "\n\n".join(evi_entries)
+                            + "\n=== END OF HISTORICAL REFERENCE ===\n\n"
+                            "Grounding Instructions:\n"
+                            "- Base your analysis on what is directly visible in the image.\n"
+                            "- Only cite [Evidence X] if the image genuinely depicts a disaster matching that historical incident.\n"
+                            "- If the image does NOT depict a disaster (e.g. poster, graphic, normal room, everyday item), do not force historical disaster evidence onto it.\n\n"
+                        )
+                    else:
+                        evidence_section = ""
+
+                    context_section = ""
+                    if conversation_history and conversation_history.strip():
+                        context_section = f"Prior Conversation History:\n{conversation_history.strip()}\n\n"
+
                     vlm_prompt = (
-                        f"You are DisasterMind, an AI disaster response specialist.\n"
+                        f"You are DisasterMind, an expert multimodal scene assessment specialist.\n"
                         f"{img_intro}"
-                        f"User Question: {question}\n\n"
-                        f"Analyze the image carefully and output your assessment in exactly this format:\n"
-                        f"DISASTER TYPE: [Single most accurate category: Earthquake, Flood, Wildfire, Landslide, Hurricane, Tornado, Explosion, or Structural Failure]\n"
+                        f"{evidence_section}"
+                        f"{context_section}"
+                        f"Current User Question: {question}\n\n"
+                        f"Instructions:\n"
+                        f"1. Objectively inspect the image. Determine whether it depicts an actual disaster or structural hazard (e.g., Earthquake, Flood, Wildfire, Landslide, Hurricane, Tornado, Explosion, Structural Failure) OR an everyday non-disaster scene (e.g., promotional poster, artwork, ordinary street, indoor room, portrait, vehicle, or everyday landscape).\n"
+                        f"2. State ONLY what is factually observable in the image. Do NOT invent rubble, collapse, or casualties if none exist.\n"
+                        f"3. Answer the user question directly and concisely.\n\n"
+                        f"Format your response EXACTLY as follows:\n"
+                        f"DISASTER TYPE: [Single most accurate category: Earthquake, Flood, Wildfire, Landslide, Hurricane, Tornado, Explosion, Structural Failure, or 'Non-Disaster / Normal Scene']\n"
                         f"CONFIDENCE: [Confidence rating between 0.70 and 0.99 based on visual clarity]\n"
-                        f"WHAT: [Detailed factual description of observable damage, collapsed elements, rubble, fire, floodwaters, or debris]\n"
-                        f"WHERE: [Setting and environment: urban street, residential district, mountainous terrain, coastal area, etc.]\n"
-                        f"HOW: [Physical causes and failure mechanisms evident in the scene]\n"
-                        f"IMPACT: [Answer to the user question, severity level, hazards to occupants, and emergency response priorities]"
+                        f"WHAT: [Factual description of what is actually visible in the image, directly answering the user question]\n"
+                        f"WHERE: [Setting, context, or environment shown in the image]\n"
+                        f"HOW: [Observed failure mechanism or cause if a disaster; or 'None / Not Applicable' if non-disaster]\n"
+                        f"IMPACT: [Assessment of hazard, severity, and response need; or 'No disaster hazards observed' if non-disaster]"
                     )
 
                     vlm_request = VLMInferenceRequest(
                         question=vlm_prompt,
                         image_path=primary_image if len(all_image_paths) <= 1 else None,
                         image_paths=all_image_paths if len(all_image_paths) > 1 else None,
-                        max_new_tokens=300,
+                        max_new_tokens=180,
                         temperature=0.0,
                     )
 
@@ -461,24 +578,29 @@ class IncidentIntelligenceService:
             # Fast Mode or VLM fallback: Build breakdown using real CLIP zero-shot classification
             if clip_result:
                 d_type = clip_result["type"]
-                prof = clip_result["profile"]
+                prof = clip_result.get("profile", {})
                 conf = clip_result["confidence"]
 
-                what = (
-                    f"Zero-shot visual embedding analysis identifies observable visual signatures of {d_type} "
-                    f"in {Path(primary_image).name}. Visual features exhibit structural damage and environmental disruption "
-                    f"characteristic of {d_type.lower()} impact (Visual Alignment: {clip_result['probability']*100:.1f}%)."
-                )
-                where = prof["where"]
-                how = prof["how"]
-                impact = prof["impact"]
+                if d_type == "Non-Disaster / Normal Scene":
+                    what = f"Visual embedding analysis of {Path(primary_image).name} indicates a normal everyday scene with no observable disaster damage."
+                    where = "Everyday environment"
+                    how = "None / Not Applicable"
+                    impact = "No disaster hazards or emergency response required."
+                else:
+                    what = (
+                        f"Zero-shot visual embedding analysis identifies visual signatures of {d_type} "
+                        f"in {Path(primary_image).name} (Visual Alignment: {clip_result['probability']*100:.1f}%)."
+                    )
+                    where = prof.get("where", "Observed incident sector")
+                    how = prof.get("how", "Structural forces evident in visual features")
+                    impact = prof.get("impact", "On-site assessment recommended")
             else:
-                d_type = "Disaster Scene"
+                d_type = "Scene Assessment"
                 conf = 0.75
-                what = f"Analysis of {len(all_image_paths)} uploaded image(s) for query: '{question}'."
-                where = "Observed disaster sector"
-                how = "Physical damage evident from visual evidence"
-                impact = "Emergency survey recommended."
+                what = f"Visual assessment of {len(all_image_paths)} uploaded image(s) for query: '{question}'."
+                where = "Observed image setting"
+                how = "None / Not Applicable"
+                impact = "Review visual evidence and assess scene context."
 
             prediction_text = (
                 f"DISASTER TYPE: {d_type}\n"
@@ -534,7 +656,11 @@ class IncidentIntelligenceService:
             },
             {
                 "source": "DisasterMind Standardized Knowledge Corpus",
-                "details": f"Retrieved {len(retrieved_snippets)} DisasterM3 multimodal evidence units via Qdrant ({retrieval_mode})",
+                "details": (
+                    f"Retrieved {len(retrieved_snippets)} DisasterM3 multimodal evidence units via Qdrant ({retrieval_mode}) and injected into VLM prompt"
+                    if retrieved_snippets
+                    else "No relevant historical DisasterM3 evidence found for this query"
+                ),
                 "verified": len(retrieved_snippets) > 0,
             },
         ]
@@ -547,6 +673,7 @@ class IncidentIntelligenceService:
             image_analyzed=bool(all_image_paths),
             image_filename=Path(primary_image).name if primary_image else None,
             image_filenames=[Path(p).name for p in all_image_paths],
+            image_paths=all_image_paths,
             images_analyzed_count=len(all_image_paths),
             summary=prediction_text,
             breakdown=breakdown,
