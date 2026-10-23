@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app.schemas.live_feed import LiveFeedIngestRequest
@@ -71,6 +72,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static file serving for uploaded disaster images
+upload_dir = Path(__file__).resolve().parent.parent / "data" / "uploads"
+upload_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(upload_dir)), name="uploads")
 
 
 # ---------------------------------------------------------------------------
@@ -479,6 +485,8 @@ def analyze_intelligence_upload(
     question: str = Form(...),
     search_live: bool = Form(True),
     engine_mode: str = Form("deep_vlm"),
+    conversation_history: Optional[str] = Form(None),
+    existing_image_paths: Optional[str] = Form(None),
     images: List[UploadFile] = File(default=[]),
     image: Optional[UploadFile] = File(None),
     intelligence_svc: Any = Depends(get_intelligence),
@@ -486,6 +494,7 @@ def analyze_intelligence_upload(
     """
     Accepts user uploaded image(s) + natural language question.
     Processes all uploaded scenes, performs real-time visual reasoning and live internet cross-correlation.
+    Preserves conversation context across follow-up queries.
     """
     saved_paths: List[str] = []
     try:
@@ -494,7 +503,22 @@ def analyze_intelligence_upload(
         upload_dir.mkdir(parents=True, exist_ok=True)
         now_ts = int(time.time())
 
-        # Collect all uploads (both multi-file and single-file)
+        # Reuse existing paths from previous session turns if provided
+        if existing_image_paths:
+            import os
+            try:
+                parsed_paths = json.loads(existing_image_paths)
+                if isinstance(parsed_paths, list):
+                    for ep in parsed_paths:
+                        if ep and os.path.exists(str(ep)) and str(ep) not in saved_paths:
+                            saved_paths.append(str(ep))
+            except Exception:
+                for ep in existing_image_paths.split(","):
+                    ep = ep.strip()
+                    if ep and os.path.exists(ep) and ep not in saved_paths:
+                        saved_paths.append(ep)
+
+        # Collect all new uploads (both multi-file and single-file)
         all_uploads: List[UploadFile] = []
         if images:
             all_uploads.extend(images)
@@ -515,6 +539,7 @@ def analyze_intelligence_upload(
             image_paths=saved_paths if saved_paths else None,
             search_live=search_live,
             engine_mode=engine_mode,
+            conversation_history=conversation_history,
         )
     except Exception as exc:
         raise HTTPException(

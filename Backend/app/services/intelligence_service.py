@@ -157,6 +157,25 @@ class IncidentIntelligenceService:
             "probability": round(best_prob, 3),
         }
 
+    def detect_disaster_type(self, text: str) -> str:
+        """Infer disaster type from text query or keywords."""
+        t = (text or "").lower()
+        if any(w in t for w in ["earthquake", "seismic", "tremor", "fault", "rubble", "collapse"]):
+            return "Earthquake"
+        if any(w in t for w in ["flood", "submerged", "inundat", "overflow", "riverbank"]):
+            return "Flood"
+        if any(w in t for w in ["wildfire", "forest fire", "flame", "burning", "canopy", "smoke"]):
+            return "Wildfire"
+        if any(w in t for w in ["landslide", "mudslide", "rockfall", "slope failure"]):
+            return "Landslide"
+        if any(w in t for w in ["hurricane", "cyclone", "typhoon", "severe storm", "gale"]):
+            return "Hurricane / Severe Storm"
+        if any(w in t for w in ["explosion", "blast", "detonation"]):
+            return "Industrial Explosion"
+        if any(w in t for w in ["tornado", "twister", "vortex"]):
+            return "Tornado"
+        return "Structural Disaster"
+
     def fetch_live_internet_evidence(
         self, query: str, disaster_type: Optional[str] = None
     ) -> List[LiveInternetEvidenceItem]:
@@ -337,11 +356,13 @@ class IncidentIntelligenceService:
         image_paths: Optional[List[str]] = None,
         search_live: bool = True,
         engine_mode: str = "deep_vlm",
+        conversation_history: Optional[str] = None,
     ) -> IntelligenceResponse:
         """
         Execute real vision inference and real live data correlation.
         - Supports single or multiple uploaded disaster images.
         - Defaults to real Qwen2.5-VL multimodal inference on Apple Silicon MPS / CUDA.
+        - Preserves conversational context across multi-turn follow-up queries.
         - Fast mode runs real CLIP zero-shot classification without placeholders.
         - NEVER emits hardcoded, prebuilt, or fake placeholder responses.
         """
@@ -423,17 +444,22 @@ class IncidentIntelligenceService:
                         else ("Examine the uploaded disaster image.\n" if all_image_paths else "")
                     )
 
+                    context_section = ""
+                    if conversation_history and conversation_history.strip():
+                        context_section = f"Prior Conversation History:\n{conversation_history.strip()}\n\n"
+
                     vlm_prompt = (
                         f"You are DisasterMind, an AI disaster response specialist.\n"
                         f"{img_intro}"
-                        f"User Question: {question}\n\n"
-                        f"Analyze the image carefully and output your assessment in exactly this format:\n"
+                        f"{context_section}"
+                        f"Current User Question: {question}\n\n"
+                        f"Analyze the image and context carefully and output your assessment in exactly this format:\n"
                         f"DISASTER TYPE: [Single most accurate category: Earthquake, Flood, Wildfire, Landslide, Hurricane, Tornado, Explosion, or Structural Failure]\n"
                         f"CONFIDENCE: [Confidence rating between 0.70 and 0.99 based on visual clarity]\n"
-                        f"WHAT: [Detailed factual description of observable damage, collapsed elements, rubble, fire, floodwaters, or debris]\n"
+                        f"WHAT: [Detailed factual description of observable damage, collapsed elements, rubble, fire, floodwaters, or debris, addressing the user question]\n"
                         f"WHERE: [Setting and environment: urban street, residential district, mountainous terrain, coastal area, etc.]\n"
                         f"HOW: [Physical causes and failure mechanisms evident in the scene]\n"
-                        f"IMPACT: [Answer to the user question, severity level, hazards to occupants, and emergency response priorities]"
+                        f"IMPACT: [Answer to the user question, considering any previous conversation context, severity level, hazards to occupants, and emergency response priorities]"
                     )
 
                     vlm_request = VLMInferenceRequest(
@@ -547,6 +573,7 @@ class IncidentIntelligenceService:
             image_analyzed=bool(all_image_paths),
             image_filename=Path(primary_image).name if primary_image else None,
             image_filenames=[Path(p).name for p in all_image_paths],
+            image_paths=all_image_paths,
             images_analyzed_count=len(all_image_paths),
             summary=prediction_text,
             breakdown=breakdown,

@@ -35,6 +35,7 @@ class IntelligenceResponse(BaseModel):
     image_analyzed: bool = True
     image_filename: Optional[str] = None
     image_filenames: List[str] = Field(default_factory=list)
+    image_paths: List[str] = Field(default_factory=list, description="Server storage paths of analyzed images for follow-up turns")
     images_analyzed_count: int = 0
     summary: str
     breakdown: IncidentBreakdown
