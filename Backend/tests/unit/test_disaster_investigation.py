@@ -5,7 +5,7 @@ Unit tests for Stages 2 & 3: Current Disaster Intelligence and Route Risk Invest
 from __future__ import annotations
 
 import io
-from pathlib import Path
+from datetime import datetime, timezone, timedelta
 from unittest.mock import MagicMock, patch
 import pytest
 from fastapi import HTTPException, UploadFile
@@ -211,3 +211,73 @@ class TestRouteRiskService:
         assert "SAFE" not in resp.safety_advisory.upper().split(" ")[0:2]
         assert "CAUTION" in resp.safety_advisory or "NO ACTIVE OFFICIAL DISASTER" in resp.safety_advisory
         assert resp.grounded_answer.direct_answer != ""
+
+    def test_route_investigation_date_beyond_horizon(self):
+        """Departure dates > 7 days in future trigger horizon warning in route advisory."""
+        mock_ext = MagicMock()
+        mock_ext.geocode.side_effect = [
+            {"display_name": "San Francisco, CA", "latitude": 37.77, "longitude": -122.41},
+            {"display_name": "San Jose, CA", "latitude": 37.33, "longitude": -121.89},
+        ]
+        mock_ext.fetch_route.return_value = (
+            {
+                "distance_km": 76.5,
+                "duration_minutes": 55.0,
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-122.41, 37.77], [-122.15, 37.55], [-121.89, 37.33]],
+                },
+                "alternatives": [],
+            },
+            SourceCheckedStatus(provider="OSRM", status="SUCCESS", records_count=1),
+        )
+        mock_ext.fetch_usgs_earthquakes.return_value = ([], SourceCheckedStatus(provider="USGS", status="NO_RECORDS_FOUND"))
+        mock_ext.fetch_gdacs_alerts.return_value = ([], SourceCheckedStatus(provider="GDACS", status="NO_RECORDS_FOUND"))
+        mock_ext.fetch_weather_hazards.return_value = ([], SourceCheckedStatus(provider="Open-Meteo", status="SUCCESS"))
+
+        svc = RouteRiskService(external_service=mock_ext)
+        # 14 days in the future
+        future_date = (datetime.now(timezone.utc) + timedelta(days=14)).strftime("%Y-%m-%d")
+        req = RouteInvestigationRequest(
+            origin="San Francisco, CA",
+            destination="San Jose, CA",
+            departure_time=future_date,
+        )
+        resp = svc.investigate_route(req)
+
+        assert resp.is_forward_looking is True
+        assert "7 days" in resp.forward_looking_warning or "horizon" in resp.forward_looking_warning.lower()
+
+    def test_location_investigation_with_target_date(self):
+        """Location investigation incorporates target_date into query and answer."""
+        mock_ext = MagicMock()
+        mock_ext.geocode.return_value = {
+            "display_name": "Antakya, Hatay, Turkey",
+            "latitude": 36.20,
+            "longitude": 36.16,
+        }
+        mock_ext.fetch_usgs_earthquakes.return_value = ([], SourceCheckedStatus(provider="USGS", status="NO_RECORDS_FOUND"))
+        mock_ext.fetch_gdacs_alerts.return_value = ([], SourceCheckedStatus(provider="GDACS", status="NO_RECORDS_FOUND"))
+        mock_ext.fetch_weather_hazards.return_value = ([], SourceCheckedStatus(provider="Open-Meteo", status="SUCCESS"))
+        from app.schemas.investigation import RecentImageryStatus
+        mock_ext.check_satellite_imagery_status.return_value = RecentImageryStatus(available=False)
+
+        service = DisasterInvestigationService(external_service=mock_ext)
+        req = LocationInvestigationRequest(location="Antakya, Turkey", target_date="tomorrow")
+        ans = service.investigate_location(req)
+
+        assert ans.confirmed_location == "Antakya, Hatay, Turkey"
+        assert "For intended date tomorrow" in ans.direct_answer
+        mock_ext.fetch_weather_hazards.assert_called_once_with(lat=36.20, lon=36.16, departure_date="tomorrow")
+
+    def test_open_meteo_horizon_exceeded_logic(self):
+        """Weather service returns Forecast Horizon Exceeded alert when target date > 7 days."""
+        ext_svc = ExternalDisasterService()
+        # 12 days in future
+        far_date = (datetime.now(timezone.utc) + timedelta(days=12)).strftime("%Y-%m-%d")
+        alerts, status = ext_svc.fetch_weather_hazards(lat=36.2, lon=36.1, departure_date=far_date)
+
+        assert status.status == "SUCCESS"
+        assert len(alerts) == 1
+        assert alerts[0].event_type == "Forecast Horizon Exceeded"
+        assert "exceeds" in alerts[0].summary.lower()

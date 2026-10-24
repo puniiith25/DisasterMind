@@ -76,6 +76,13 @@ class MultimodalRetrievalResponse(BaseModel):
     latency_ms: float
 
 
+class TextEvidenceResponse(BaseModel):
+    """Response containing retrieved text evidence matches."""
+    query: str
+    top_k: int
+    text_matches: List[Any] = Field(default_factory=list)
+
+
 # ---------------------------------------------------------------------------
 # Reciprocal Rank Fusion
 # ---------------------------------------------------------------------------
@@ -297,6 +304,23 @@ class MultimodalRetrievalService:
             image_results_count=len(image_results),
             fused_results=fused_results,
             latency_ms=latency_ms,
+        )
+
+    def retrieve_text_evidence(
+        self,
+        question: str,
+        top_k: int = 3,
+    ) -> TextEvidenceResponse:
+        """
+        Retrieve text evidence from the underlying Qdrant corpus.
+        Provides a direct helper for services querying historical text evidence.
+        """
+        resp = self.qdrant_service.retrieve(query=question, top_k=top_k)
+        matches = resp.results if hasattr(resp, "results") else []
+        return TextEvidenceResponse(
+            query=question,
+            top_k=top_k,
+            text_matches=matches,
         )
 
     def _retrieve_by_image(

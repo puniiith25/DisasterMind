@@ -292,3 +292,14 @@ class TestMultimodalRetrievalService:
 
         assert response.fusion_mode == "text_only"
         assert len(response.fused_results) >= 1
+
+    def test_retrieve_text_evidence_direct_helper(self):
+        """retrieve_text_evidence returns TextEvidenceResponse with text_matches."""
+        text_results = [make_text_result(1, "evi_101"), make_text_result(2, "evi_102")]
+        service = make_service(text_results)
+
+        resp = service.retrieve_text_evidence(question="flooding in Hatay", top_k=2)
+        assert resp.query == "flooding in Hatay"
+        assert resp.top_k == 2
+        assert len(resp.text_matches) == 2
+        assert resp.text_matches[0].evidence_id == "evi_101"

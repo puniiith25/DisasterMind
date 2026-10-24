@@ -122,6 +122,10 @@ class LocationInvestigationRequest(BaseModel):
     )
     confirmed_latitude: Optional[float] = None
     confirmed_longitude: Optional[float] = None
+    target_date: Optional[str] = Field(
+        default=None,
+        description="Intended travel date or date of inquiry (e.g. '2026-10-24', 'tomorrow')"
+    )
 
 
 class RouteHazardItem(BaseModel):

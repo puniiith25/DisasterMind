@@ -40,15 +40,13 @@ export default function RouteMap({ routeGeometry, hazards = [], originCoords, de
 
     const bounds = [];
 
-    // 1. Draw route polyline if present
+    // 1. Draw route polyline in burnt orange
     if (routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 0) {
-      // GeoJSON has [lon, lat], Leaflet expects [lat, lon]
       const latLngs = routeGeometry.coordinates.map(pt => [pt[1], pt[0]]);
-      const polyline = L.polyline(latLngs, {
-        color: '#38bdf8',
+      L.polyline(latLngs, {
+        color: '#C96B3C',
         weight: 5,
-        opacity: 0.85,
-        dashArray: null,
+        opacity: 0.95,
       }).addTo(layers);
 
       latLngs.forEach(pt => bounds.push(pt));
@@ -58,26 +56,26 @@ export default function RouteMap({ routeGeometry, hazards = [], originCoords, de
     if (originCoords && originCoords.latitude && originCoords.longitude) {
       const oMarker = L.circleMarker([originCoords.latitude, originCoords.longitude], {
         radius: 8,
-        fillColor: '#10b981',
+        fillColor: '#286E3B',
         color: '#ffffff',
         weight: 2,
         opacity: 1,
-        fillOpacity: 0.9,
+        fillOpacity: 0.95,
       }).addTo(layers);
-      oMarker.bindPopup('<strong>Origin Departure</strong>');
+      oMarker.bindPopup('<strong style="color: #286E3B; font-family: sans-serif;">Origin Departure</strong>');
       bounds.push([originCoords.latitude, originCoords.longitude]);
     }
 
     if (destinationCoords && destinationCoords.latitude && destinationCoords.longitude) {
       const dMarker = L.circleMarker([destinationCoords.latitude, destinationCoords.longitude], {
         radius: 8,
-        fillColor: '#6366f1',
+        fillColor: '#C96B3C',
         color: '#ffffff',
         weight: 2,
         opacity: 1,
-        fillOpacity: 0.9,
+        fillOpacity: 0.95,
       }).addTo(layers);
-      dMarker.bindPopup('<strong>Destination Target</strong>');
+      dMarker.bindPopup('<strong style="color: #C96B3C; font-family: sans-serif;">Destination Target</strong>');
       bounds.push([destinationCoords.latitude, destinationCoords.longitude]);
     }
 
@@ -86,7 +84,7 @@ export default function RouteMap({ routeGeometry, hazards = [], originCoords, de
       hazards.forEach(h => {
         if (h.latitude && h.longitude) {
           const isCritical = h.severity === 'CRITICAL' || h.severity === 'MAJOR';
-          const pinColor = isCritical ? '#f43f5e' : '#f59e0b';
+          const pinColor = isCritical ? '#9B2C2C' : '#B45309';
 
           const hMarker = L.circleMarker([h.latitude, h.longitude], {
             radius: isCritical ? 9 : 7,
@@ -94,16 +92,16 @@ export default function RouteMap({ routeGeometry, hazards = [], originCoords, de
             color: '#ffffff',
             weight: 2,
             opacity: 1,
-            fillOpacity: 0.9,
+            fillOpacity: 0.95,
           }).addTo(layers);
 
           const popupContent = `
-            <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
-              <span style="font-weight: bold; color: ${pinColor};">[${h.severity}] ${h.hazard_type}</span><br/>
-              <strong>${h.title}</strong><br/>
-              <span style="color: #555;">Source: ${h.source}</span><br/>
-              <span style="color: #666;">Distance to Route: ${h.distance_to_route_km} km</span><br/>
-              <p style="margin-top: 4px; font-size: 11px;">${h.details}</p>
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.45; color: #38251F;">
+              <span style="font-weight: 700; color: ${pinColor};">[${h.severity}] ${h.hazard_type}</span><br/>
+              <strong style="color: #38251F;">${h.title}</strong><br/>
+              <span style="color: #786A60;">Source: ${h.source}</span><br/>
+              <span style="color: #786A60;">Distance to Corridor: ${h.distance_to_route_km} km</span><br/>
+              <p style="margin-top: 5px; font-size: 11px; color: #6E4638;">${h.details}</p>
             </div>
           `;
           hMarker.bindPopup(popupContent);
@@ -123,22 +121,26 @@ export default function RouteMap({ routeGeometry, hazards = [], originCoords, de
   }, [routeGeometry, hazards, originCoords, destinationCoords]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '380px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+    <div style={{ position: 'relative', width: '100%', height: '380px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--color-subtle-border)', boxShadow: 'var(--shadow-subtle)' }}>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
       <div style={{
         position: 'absolute',
-        bottom: '8px',
-        right: '8px',
-        background: 'rgba(15, 23, 42, 0.85)',
+        bottom: '10px',
+        right: '10px',
+        backgroundColor: 'rgba(255, 252, 247, 0.94)',
         backdropFilter: 'blur(8px)',
-        padding: '4px 8px',
-        borderRadius: '6px',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid var(--color-subtle-border)',
+        padding: '5px 10px',
+        borderRadius: '8px',
         fontSize: '11px',
-        color: '#94a3b8',
+        fontWeight: 500,
+        color: '#6E4638',
+        boxShadow: 'var(--shadow-subtle)',
         zIndex: 1000,
         pointerEvents: 'none',
       }}>
-        🟢 Origin | 🟣 Destination | 🔴 Major Hazard | 🟡 Advisory Alert
+        🟢 Origin | 🟠 Destination | 🔴 Major Hazard | 🟡 Advisory Alert
       </div>
     </div>
   );

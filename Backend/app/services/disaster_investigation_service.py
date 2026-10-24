@@ -159,7 +159,10 @@ class DisasterInvestigationService:
         source_links.append({"name": gdacs_stat.provider, "url": "https://www.gdacs.org"})
 
         # 2c. Open-Meteo Weather Hazards
-        weather_alerts, weather_stat = self.external_svc.fetch_weather_hazards(lat=lat, lon=lon)
+        target_date_val = getattr(request, "target_date", None)
+        weather_alerts, weather_stat = self.external_svc.fetch_weather_hazards(
+            lat=lat, lon=lon, departure_date=target_date_val
+        )
         sources_checked.append(weather_stat)
         source_links.append({"name": weather_stat.provider, "url": "https://open-meteo.com"})
 
@@ -226,26 +229,42 @@ class DisasterInvestigationService:
         # 4. Synthesize 10-Point Grounded Answer
         latest_official_alert = affecting_alerts[0] if affecting_alerts else (nearby_alerts[0] if nearby_alerts else None)
 
+        horizon_alert = next((w for w in weather_alerts if w.event_type == "Forecast Horizon Exceeded"), None)
+        target_prefix = f"For intended date {target_date_val}: " if target_date_val else ""
+
         if affecting_alerts:
             top_a = affecting_alerts[0]
             direct_answer = (
-                f"Active disaster alert detected for {confirmed_display_name}: {top_a.title}. "
+                f"{target_prefix}Active disaster alert detected for {confirmed_display_name}: {top_a.title}. "
                 f"Source: {top_a.source}. Severity: {top_a.severity}. Details: {top_a.summary}"
+            )
+        elif horizon_alert:
+            direct_answer = (
+                f"{target_prefix}The requested date exceeds Open-Meteo's 7-day numerical forecast horizon. "
+                f"No major seismic or multi-hazard alerts are active today for {confirmed_display_name}, "
+                "but weather hazards cannot be reliably forecast beyond 7 days."
             )
         elif nearby_alerts:
             top_n = nearby_alerts[0]
             direct_answer = (
-                f"No major disaster was reported directly at {confirmed_display_name}, but a nearby event was recorded: "
+                f"{target_prefix}No major disaster was reported directly at {confirmed_display_name}, but a nearby event was recorded: "
                 f"{top_n.title} located approximately {top_n.distance_km:.1f} km away ({top_n.source})."
             )
         else:
             direct_answer = (
-                f"No relevant active disaster alerts or extreme weather emergencies were found in the official sources checked "
+                f"{target_prefix}No relevant active disaster alerts or extreme weather emergencies were found in the official sources checked "
                 f"(USGS, GDACS, Open-Meteo) for {confirmed_display_name}. "
                 "Note: This indicates no active report in monitored feeds, not definitive proof that no localized event occurred."
             )
 
         recent_imagery = self.external_svc.check_satellite_imagery_status(lat=lat, lon=lon)
+
+        uncertainty_note = (
+            "Ground-level structural sensor data and local municipal road closures are not available in global feeds. "
+            "Atmospheric conditions reflect numerical weather models."
+        )
+        if horizon_alert:
+            uncertainty_note += f" Limitation: {horizon_alert.summary}"
 
         return InvestigationGroundedAnswer(
             direct_answer=direct_answer,
@@ -262,10 +281,7 @@ class DisasterInvestigationService:
             location_provenance=location_provenance,
             location_coords={"latitude": lat, "longitude": lon},
             conflicting_evidence=None,
-            missing_information_and_uncertainty=(
-                "Ground-level structural sensor data and local municipal road closures are not available in global feeds. "
-                "Atmospheric conditions reflect numerical weather models."
-            ),
+            missing_information_and_uncertainty=uncertainty_note,
             practical_next_verification_step=(
                 f"Consult national disaster management agencies (e.g. FEMA in the US, AFAD in Turkey, NDMA in India) "
                 f"and local municipality emergency management for street-by-street incident reports."

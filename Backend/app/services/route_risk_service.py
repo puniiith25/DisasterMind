@@ -18,7 +18,7 @@ Safety Rules:
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import math
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -164,18 +164,40 @@ class RouteRiskService:
         dur_min = route_data.get("duration_minutes", 0.0)
         alternatives = route_data.get("alternatives", [])
 
-        # 3. Check for Forward-Looking Departure (> 24 hours in the future)
+        # 3. Check for Forward-Looking Departure
         is_forward = False
         forward_warning = None
         if departure_str:
             is_forward = True
-            forward_warning = (
-                f"Forward-Looking Advisory: Your departure is scheduled for {departure_str}. "
-                "Current hazard bulletins and weather observations reflect real-time conditions today and CANNOT "
-                "guarantee highway passability or storm behavior on your departure date. "
-                "Weather systems, flooding, and road repairs change dynamically. Re-verify with official Department of "
-                "Transportation (DOT) feeds and local police within 6 hours of departure."
-            )
+            days_ahead = 0
+            try:
+                clean_dep = departure_str.strip().split("T")[0]
+                if clean_dep.lower() == "tomorrow":
+                    target_dt = datetime.now(timezone.utc).date() + timedelta(days=1)
+                elif clean_dep.lower() in ("today", "now"):
+                    target_dt = datetime.now(timezone.utc).date()
+                else:
+                    target_dt = datetime.fromisoformat(clean_dep).date()
+                days_ahead = (target_dt - datetime.now(timezone.utc).date()).days
+            except Exception:
+                days_ahead = 1
+
+            if days_ahead > 7:
+                forward_warning = (
+                    f"Forward-Looking Advisory: Your departure is scheduled for {departure_str} ({days_ahead} days ahead). "
+                    "Notice: Open-Meteo numerical weather prediction models only span 7 days ahead. "
+                    "Atmospheric hazards and storm systems beyond 7 days cannot be reliably verified at this lead time. "
+                    "Active earthquake telemetry reflects tremors today and cannot predict future seismic activity. "
+                    "Re-check official Department of Transportation (DOT) and civil protection feeds 24-48 hours before departure."
+                )
+            else:
+                forward_warning = (
+                    f"Forward-Looking Advisory: Your departure is scheduled for {departure_str}. "
+                    "Corridor weather conditions reflect available numerical forecasts. "
+                    "Active hazard bulletins reflect real-time conditions today and CANNOT guarantee future highway passability or aftershocks. "
+                    "Weather systems, flooding, and road repairs change dynamically. Re-verify with official Department of "
+                    "Transportation (DOT) feeds and local police within 6 hours of departure."
+                )
 
         # 4. Query External Disaster Feeds along Route Corridor
         # Sample points: origin, midpoint, destination

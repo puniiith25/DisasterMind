@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 import math
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta, date
 from typing import Any, Dict, List, Optional, Tuple
 import xml.etree.ElementTree as ET
 
@@ -413,12 +413,69 @@ class ExternalDisasterService:
             if now - ts < CACHE_TTL_SECONDS:
                 return cached_data
 
+        # Parse departure_date and check forecast horizon
+        target_dt: Optional[date] = None
+        days_ahead: int = 0
+        if departure_date:
+            try:
+                clean_d = departure_date.strip().split("T")[0]
+                if clean_d.lower() == "tomorrow":
+                    target_dt = datetime.now(timezone.utc).date() + timedelta(days=1)
+                elif clean_d.lower() in ("today", "now"):
+                    target_dt = datetime.now(timezone.utc).date()
+                else:
+                    target_dt = datetime.fromisoformat(clean_d).date()
+                today = datetime.now(timezone.utc).date()
+                days_ahead = (target_dt - today).days
+            except Exception as e:
+                logger.debug(f"Could not parse departure_date '{departure_date}': {e}")
+
+        # Check if requested date is beyond Open-Meteo's standard 7-day forecast horizon
+        if target_dt is not None and days_ahead > 7:
+            dur_ms = (time.perf_counter() - start_t) * 1000.0
+            alert = NormalizedDisasterAlert(
+                alert_id=f"weather_{lat}_{lon}_out_of_horizon",
+                source=provider,
+                source_id="horizon_exceeded",
+                source_url="https://open-meteo.com",
+                event_type="Forecast Horizon Exceeded",
+                title=f"Travel Date Outside 7-Day Forecast Horizon ({target_dt.isoformat()})",
+                severity="ADVISORY",
+                latitude=lat,
+                longitude=lon,
+                event_location=f"Coordinates ({lat:.3f}, {lon:.3f})",
+                distance_km=0.0,
+                affects_location=False,
+                event_time=target_dt.isoformat(),
+                published_at=datetime.now(timezone.utc).isoformat(),
+                summary=(
+                    f"The requested travel date ({target_dt.isoformat()}) is {days_ahead} days in the future, "
+                    "which exceeds the 7-day numerical weather prediction horizon supported by Open-Meteo. "
+                    "Atmospheric conditions and localized storm hazards cannot be reliably forecast at this lead time. "
+                    "Re-verify conditions 24 to 48 hours prior to departure."
+                ),
+                limitations=f"Target date is {days_ahead} days ahead (max forecast horizon is 7 days).",
+            )
+            alerts.append(alert)
+            status_rec = SourceCheckedStatus(
+                provider=provider,
+                status="SUCCESS",
+                records_count=1,
+                latency_ms=round(dur_ms, 2),
+                details=f"Target date {target_dt.isoformat()} exceeds 7-day forecast horizon.",
+            )
+            res = (alerts, status_rec)
+            _EXTERNAL_CACHE[cache_key] = (now, res)
+            return res
+
         url = "https://api.open-meteo.com/v1/forecast"
         params = {
             "latitude": lat,
             "longitude": lon,
             "current": "temperature_2m,wind_speed_10m,precipitation,weather_code",
+            "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max",
             "forecast_days": 7,
+            "timezone": "auto",
         }
 
         try:
@@ -428,11 +485,84 @@ class ExternalDisasterService:
 
                 if resp.status_code == 200:
                     data = resp.json()
+
+                    # Handle future forecast day if target_dt is in the future
+                    if target_dt is not None and days_ahead > 0:
+                        daily = data.get("daily", {})
+                        daily_dates = daily.get("time", [])
+                        target_iso = target_dt.isoformat()
+
+                        if target_iso in daily_dates:
+                            idx = daily_dates.index(target_iso)
+                            temp_max = daily.get("temperature_2m_max", [None])[idx]
+                            temp_min = daily.get("temperature_2m_min", [None])[idx]
+                            wind = daily.get("wind_speed_10m_max", [0.0])[idx] or 0.0
+                            precip = daily.get("precipitation_sum", [0.0])[idx] or 0.0
+                            wcode = daily.get("weather_code", [0])[idx] or 0
+
+                            has_hazard = False
+                            severity = "ADVISORY"
+                            h_type = "Severe Weather Forecast"
+                            details_list = []
+
+                            if wind >= 60.0:
+                                has_hazard = True
+                                severity = "CRITICAL" if wind >= 85.0 else "MAJOR"
+                                h_type = "High Wind Hazard Forecast"
+                                details_list.append(f"Forecast gale/storm wind gusts: {wind} km/h")
+                            elif wind >= 40.0:
+                                details_list.append(f"Elevated forecast wind gusts: {wind} km/h")
+
+                            if precip >= 15.0:
+                                has_hazard = True
+                                severity = "MAJOR"
+                                h_type = "Heavy Precipitation / Flood Risk Forecast"
+                                details_list.append(f"Heavy daily rainfall forecast: {precip} mm")
+                            elif precip >= 5.0:
+                                details_list.append(f"Moderate rainfall forecast: {precip} mm")
+
+                            if wcode in (95, 96, 99):
+                                has_hazard = True
+                                h_type = "Thunderstorm / Convective Hazard Forecast"
+                                severity = "MAJOR"
+                                details_list.append("Convective storm and lightning predicted")
+                            elif wcode in (71, 73, 75, 85, 86):
+                                has_hazard = True
+                                h_type = "Winter Snowstorm Forecast"
+                                details_list.append("Significant snowfall accumulation predicted")
+
+                            summary_txt = (
+                                f"Forecast for {target_iso}: Min {temp_min}°C, Max {temp_max}°C | "
+                                f"Max Wind: {wind} km/h | Precip: {precip} mm. "
+                                + ("; ".join(details_list) if details_list else "Favorable/manageable conditions expected.")
+                            )
+
+                            alert = NormalizedDisasterAlert(
+                                alert_id=f"weather_forecast_{lat}_{lon}_{target_iso}",
+                                source=provider,
+                                source_id=f"wmo_daily_{wcode}",
+                                source_url="https://open-meteo.com",
+                                event_type=h_type,
+                                title=f"{h_type} ({temp_min}°C to {temp_max}°C)" if has_hazard else f"Atmospheric Forecast ({temp_min}°C to {temp_max}°C)",
+                                severity=severity if has_hazard else "ADVISORY",
+                                latitude=lat,
+                                longitude=lon,
+                                event_location=f"Coordinates ({lat:.3f}, {lon:.3f})",
+                                distance_km=0.0,
+                                affects_location=has_hazard,
+                                event_time=target_iso,
+                                published_at=datetime.now(timezone.utc).isoformat(),
+                                summary=summary_txt,
+                                limitations=f"7-day numerical forecast model for {target_iso}; subject to synoptic shifts.",
+                            )
+                            alerts.append(alert)
+
+                    # Also include current observation if available
                     curr = data.get("current", {})
                     temp = curr.get("temperature_2m")
-                    wind = curr.get("wind_speed_10m", 0.0)
-                    precip = curr.get("precipitation", 0.0)
-                    wcode = curr.get("weather_code", 0)
+                    wind = curr.get("wind_speed_10m", 0.0) or 0.0
+                    precip = curr.get("precipitation", 0.0) or 0.0
+                    wcode = curr.get("weather_code", 0) or 0
 
                     # Assess hazards based on thresholds
                     # WMO codes: 95-99 = thunderstorm, 65-67 = heavy rain/freezing rain, 75 = heavy snow
@@ -467,7 +597,7 @@ class ExternalDisasterService:
                         h_type = "Winter Storm / Blizzard Risk"
                         details_list.append("Snowfall accumulation and freezing precipitation")
 
-                    summary_txt = f"Temp: {temp}°C | Wind: {wind} km/h | Precipitation: {precip} mm/h. " + "; ".join(details_list)
+                    summary_txt = f"Current Obs: Temp: {temp}°C | Wind: {wind} km/h | Precipitation: {precip} mm/h. " + "; ".join(details_list)
 
                     alert = NormalizedDisasterAlert(
                         alert_id=f"weather_{lat}_{lon}",
